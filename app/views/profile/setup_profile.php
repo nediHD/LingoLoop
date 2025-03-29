@@ -11,7 +11,6 @@ if (!SessionManager::isLoggedIn()) {
 $username = $_SESSION['username'];
 $userId = $_SESSION['user_id'];
 ?>
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -88,6 +87,18 @@ $userId = $_SESSION['user_id'];
     <div class="container" x-data="wizard()">
         <form id="profileForm" action="/lingoloop/public/SaveProfileController.php" method="POST" onsubmit="return validateForm()">
             <input type="hidden" name="user_id" value="<?= $userId ?>">
+            
+            <!-- Step 0: Einführung -->
+            <div class="step" id="step0">
+                <h2>Willkommen!</h2>
+                <p style="margin-bottom: 20px;">
+                    Um Ihnen das bestmögliche Lernerlebnis zu bieten, bitten wir Sie, einige kurze Fragen zu beantworten.
+                    Ihre Antworten helfen uns, den Unterricht genau auf Ihre Interessen und Bedürfnisse abzustimmen.
+                    Alle Daten sind vollständig privat und werden ausschließlich zur Personalisierung Ihres Lernens verwendet.
+                    Vielen Dank für Ihre Zusammenarbeit!
+                </p>
+            </div>
+            
             <!-- Step 1: Persönliche Daten -->
             <div class="step" id="step1">
                 <h2>Schritt 1: Persönliche Daten</h2>
@@ -126,7 +137,7 @@ $userId = $_SESSION['user_id'];
                     </select>
                 </div>
             </div>
-
+            
             <!-- Step 2: Lernziele -->
             <div class="step" id="step2">
                 <h2>Schritt 2: Lernziele</h2>
@@ -144,12 +155,12 @@ $userId = $_SESSION['user_id'];
                     </select>
                 </div>
             </div>
-
+            
             <!-- Step 3: Lernstil -->
             <div class="step" id="step3">
                 <h2>Schritt 3: Lernstil</h2>
                 <div class="form-group">
-                    <label>Bevorzugte Lernmethode (z.B. Vokabeln üben, Videos anschauen, Lesen, Schreiben)</label>
+                    <label>Bevorzugte Lernmethode (z.B. "Vokabeln üben, Videos anschauen, Lesen, Schreiben")</label>
                     <input type="text" name="learning_style" placeholder="Vokabeln üben, Videos anschauen, Lesen, Schreiben" required>
                 </div>
                 <div class="form-group">
@@ -157,7 +168,7 @@ $userId = $_SESSION['user_id'];
                     <input type="text" name="previous_apps" placeholder="z.B. Duolingo">
                 </div>
             </div>
-
+            
             <!-- Step 4: Interessen & Hobbys -->
             <div class="step" id="step4">
                 <h2>Schritt 4: Interessen & Hobbys</h2>
@@ -170,7 +181,7 @@ $userId = $_SESSION['user_id'];
                     <textarea name="favorite_content" placeholder="z.B. YouTube-Kanäle, Podcasts" required></textarea>
                 </div>
             </div>
-
+            
             <!-- Navigation Buttons -->
             <div class="nav-buttons">
                 <button type="button" id="prevBtn" onclick="prevStep()" disabled>Zurück</button>
@@ -181,7 +192,6 @@ $userId = $_SESSION['user_id'];
     </div>
 
     <script>
-        // Wizard Navigation Logic
         let currentStep = 0;
         const steps = document.querySelectorAll('.step');
         const prevBtn = document.getElementById('prevBtn');
@@ -218,12 +228,13 @@ $userId = $_SESSION['user_id'];
             }
         }
 
-        // Custom validation for current step
+        // Custom validation for current step (skip intro step)
         function validateCurrentStep() {
+            if (currentStep === 0) return true;
             const currentFields = steps[currentStep].querySelectorAll('input[required], select[required], textarea[required]');
             for (const field of currentFields) {
                 if (!field.value.trim()) {
-                    alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent + "' aus.");
+                    alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent.trim() + "' aus.");
                     field.focus();
                     return false;
                 }
@@ -232,13 +243,12 @@ $userId = $_SESSION['user_id'];
         }
 
         function validateForm() {
-            // Validate all steps before submitting the form
-            for (let i = 0; i < steps.length; i++) {
+            // Validate all steps before submitting
+            for (let i = 1; i < steps.length; i++) {
                 const fields = steps[i].querySelectorAll('input[required], select[required], textarea[required]');
                 for (const field of fields) {
                     if (!field.value.trim()) {
-                        alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent + "' aus.");
-                        // Navigate to the step with error
+                        alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent.trim() + "' aus.");
                         currentStep = i;
                         showStep(currentStep);
                         field.focus();
