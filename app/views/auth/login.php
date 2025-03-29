@@ -28,6 +28,6 @@ if (SessionManager::isLoggedIn()) {
 
         <button type="submit">Login</button>
     </form>
-    <p>Don't have an account? <a href="/app/views/auth/register.php">Register here</a></p>
+    <p>Don't have an account? <a href="/lingoloop/public/?action=register">Register here</a>
 </body>
 </html>

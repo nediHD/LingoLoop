@@ -42,5 +42,5 @@ class Database {
     /**
      * Private unserialize method to prevent restoring from string.
      */
-    private function __wakeup() {}
+    public function __wakeup() {}
 }

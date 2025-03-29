@@ -1,7 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../app/controllers/AuthController.php';
-require_once __DIR__ . '/../core/SessionManager.php';
+define('BASE_PATH', dirname(__DIR__));
+
+require_once BASE_PATH . '/app/controllers/AuthController.php';
+require_once BASE_PATH . '/core/SessionManager.php';
 
 // Handle login or register action
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,8 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $error = $auth->login($username, $password);
         if ($error) {
-            // Prikazi grešku u login view
-            include __DIR__ . '/../app/views/auth/login.php';
+            // Show login error view
+            include BASE_PATH . '/app/views/auth/login.php';
+        } else {
+            // Redirect to dashboard or welcome
+            include BASE_PATH . '/app/views/dashboard.php'; // Or create this file
         }
     }
 
@@ -26,15 +31,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $error = $auth->register($username, $email, $password);
         if ($error) {
-            // Prikazi grešku u register view
-            include __DIR__ . '/../app/views/auth/register.php';
+            // Show registration error view
+            include BASE_PATH . '/app/views/auth/register.php';
         } else {
-            // Nakon uspješne registracije, automatski ulogiraj
+            // Automatically log the user in after registration
             $auth->login($username, $password);
+            include BASE_PATH . '/app/views/auth/login.php'; // Redirect to login
         }
     }
+} elseif (isset($_GET['action']) && $_GET['action'] === 'register') {
+    include BASE_PATH . '/app/views/auth/register.php';
 } else {
-    // Ako se direktno pristupi, preusmjeri na login
-    header("Location: /app/views/auth/login.php");
-    exit();
+    // Default: Show login view directly
+    include BASE_PATH . '/app/views/auth/login.php';
 }

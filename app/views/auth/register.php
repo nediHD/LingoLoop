@@ -31,6 +31,6 @@ if (SessionManager::isLoggedIn()) {
 
         <button type="submit">Register</button>
     </form>
-    <p>Already have an account? <a href="/app/views/auth/login.php">Login here</a></p>
+    <p>Already have an account? <a href="/lingoloop/public/?action=login">Login here</a>
 </body>
 </html>
