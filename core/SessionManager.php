@@ -52,6 +52,15 @@ class SessionManager {
         return isset($_SESSION['user_id']);
     }
 
+
+    
+
+    public static function startSession(): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
     /**
      * getUsername
      * 
@@ -62,4 +71,7 @@ class SessionManager {
     public static function getUsername(): ?string {
         return $_SESSION['username'] ?? null;
     }
+
+    
+    
 }

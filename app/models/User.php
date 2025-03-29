@@ -67,4 +67,18 @@ class User {
     public function exists(string $username): bool {
         return $this->findByUsername($username) !== null;
     }
+
+    public function hasProfile(int $userId): bool {
+    $sql = "SELECT 1 FROM user_profiles WHERE user_id = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    return $stmt->num_rows > 0;
+    }
+
+    
+
+
 }
