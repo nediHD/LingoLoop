@@ -6,7 +6,7 @@ class Database:
 
     @classmethod
     def get_instance(cls):
-        print(DB_CONFIG)
+        
 
         if cls.__instance is None:
             cls.__instance = mysql.connector.connect(
