@@ -262,5 +262,10 @@ $userId = $_SESSION['user_id'];
         // Initialize first step
         showStep(currentStep);
     </script>
+    <script>
+    window.addEventListener("beforeunload", function () {
+        navigator.sendBeacon("/lingoloop/public/logout.php");
+    });
+    </script>
 </body>
 </html>

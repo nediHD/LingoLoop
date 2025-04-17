@@ -28,6 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             include BASE_PATH . '/app/views/auth/register.php';
         }
     }
+    if ($action === 'select_vocab') {
+        include BASE_PATH . '/app/views/dashboard/select_vocab.php';
+    }
+    if ($action === '[]') {
+        include BASE_PATH . '/app/views/auth/login.php';
+    }
+    
+    
 } else {
     $action = $_GET['action'] ?? null;
 
@@ -35,9 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         include BASE_PATH . '/app/views/auth/register.php';
     } elseif ($action === 'welcome') {
         include BASE_PATH . '/app/views/dashboard/welcome.php';
-    } elseif ($action === 'login') {
-        include BASE_PATH . '/app/views/auth/login.php';
-    } else {
+    } elseif ($action === 'setup_profile') {
         include BASE_PATH . '/app/views/profile/setup_profile.php';
+    } elseif ($action === 'select_vocab') {
+        include BASE_PATH . '/app/views/dashboard/select_vocab.php';
+    }elseif ($action === 'save_vocab') {
+        include BASE_PATH . '/app/controllers/mama.php';
+    } else {
+        include BASE_PATH . '/app/views/auth/login.php';
     }
 }

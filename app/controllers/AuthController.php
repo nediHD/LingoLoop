@@ -24,12 +24,21 @@ class AuthController {
 
             // 👇 Provjeri da li korisnik već ima profil
             if (!$this->userModel->hasProfile($user['id'])) {
-                header("Location: /lingoloop/public/index.php?action=setup_profile");
+                header("Location: /lingoloop/public/?action=setup_profile");
                 exit();
             }
 
-            header("Location: /lingoloop/public/index.php?action=welcome");
+            $command = "python ../app/models/ai_vocabulary_generation.py {$user['id']} 2>&1";
+            $output = shell_exec($command);
+            $vocab = json_decode($output, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $_SESSION['vocab_list'] = $vocab;
+            header("Location: /lingoloop/public/?action=select_vocab");
             exit();
+        } else {
+            echo "Error decoding vocabulary list.";
+        }
         }
 
         return "Invalid credentials.";

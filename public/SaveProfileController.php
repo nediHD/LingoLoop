@@ -56,11 +56,15 @@ if ($stmt->execute()) {
     // 🔥 Pozovi Python skriptu
     $command = "python ../app/models/ai_vocabulary_generation.py {$user_id} 2>&1";
     $output = shell_exec($command);
+    $vocab = json_decode($output, true);
 
-    
-    echo $output;
-    
-    exit();
+if (json_last_error() === JSON_ERROR_NONE) {
+    $_SESSION['vocab_list'] = $vocab;
+    header("Location: /lingoloop/public/?action=select_vocab");
+} else {
+    echo "Error decoding vocabulary list.";
+}
+
 } else {
     echo "Error saving profile: " . $stmt->error;
 }
