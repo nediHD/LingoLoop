@@ -1,16 +1,39 @@
-
 <?php
-define('BASE_PATH', dirname(__DIR__));
+define('BASE_PATH', dirname(__DIR__)); // falls notwendig anpassen
+
 require_once BASE_PATH . '/models/SessionManager.php';
+require_once BASE_PATH . '/models/Database.php';
+require_once BASE_PATH . '/models/SaveVocab.php';
 
 SessionManager::startSession();
+
 if (!SessionManager::isLoggedIn()) {
     header("Location: /lingoloop/view/index.php?action=login");
-
     exit();
 }
 
-$vocabList = $_SESSION['vocab_list'];
+$userId = $_SESSION['user_id'] ?? null;
+$vocabList = $_SESSION['vocab_list'] ?? [];
+$selectedIndexes = json_decode($_POST['selected_words'] ?? '[]', true);
+
+$db = Database::getInstance();
+$vocabHandler = new UserVocabulary($db);
+
+if($vocabHandler->hasAnyWords($userId)){
+    header("Location: /lingoloop/view/dashboard.php");
+    exit(); 
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+try {
+    $vocabHandler->saveSelectedWords($userId, $vocabList, $selectedIndexes);
+    // Nach dem Speichern löschen wir die Liste aus der Session
+    unset($_SESSION['vocab_list']);
+    header("Location: /lingoloop/view/dashboard.php");
+    exit();
+} catch (Exception $e) {
+    echo "Fehler: " . $e->getMessage();
+}}
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +78,7 @@ $vocabList = $_SESSION['vocab_list'];
 
 <h2>Select Up to 10 Favorite Words ❤️</h2>
 
-<form method="POST" action="/lingoloop/view/index.php">
+<form method="POST" action="/lingoloop/view/select_vocab.php">
     <?php foreach ($vocabList as $index => $item): ?>
         <div class="word-box">
             <div>
@@ -68,11 +91,7 @@ $vocabList = $_SESSION['vocab_list'];
     <input type="hidden" name="selected_words" id="selectedWords" value="[]">
     <button type="submit">Save Selected Words</button>
 </form>
-<script>
-window.addEventListener("beforeunload", function () {
-  navigator.sendBeacon("/LingoLoop/controller/LogoutController.php");
-});
-</script>
+
 
 
 </body>

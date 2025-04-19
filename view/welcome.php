@@ -1,4 +1,6 @@
 <?php
+define('BASE_PATH', dirname(__DIR__)); // ⬅️ Dodaj ovo
+
 require_once BASE_PATH . '/models/SessionManager.php';
 
 SessionManager::startSession();
