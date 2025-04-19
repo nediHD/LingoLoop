@@ -60,7 +60,7 @@ if ($stmt->execute()) {
 
 if (json_last_error() === JSON_ERROR_NONE) {
     $_SESSION['vocab_list'] = $vocab;
-    header("Location: /lingoloop/public/?action=select_vocab");
+    header("Location: /lingoloop/view/index.php?action=select_vocab");
 } else {
     echo "Error decoding vocabulary list.";
 }

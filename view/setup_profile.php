@@ -1,12 +1,44 @@
 <?php
-require_once __DIR__ . '/../../../core/SessionManager.php';
+define('BASE_PATH', dirname(__DIR__));
+
+require_once BASE_PATH . '/models/SessionManager.php';
+require_once BASE_PATH . '/models/Database.php';
+require_once BASE_PATH . '/models/SaveProfile.php';
+require_once BASE_PATH . '/controller/AuthController.php';
+
 
 SessionManager::startSession();
 
+// Ako nije ulogovan → redirect
 if (!SessionManager::isLoggedIn()) {
-    header("Location: /lingoloop/public/?action=login");
+    header("Location: /lingoloop/view/login.php");
     exit();
 }
+
+$userId = $_SESSION['user_id'];
+$db = Database::getInstance();
+$saveProfile = new SaveProfile($db);
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = [
+        'user_id' => $userId,
+        'first_name' => trim($_POST['first_name']),
+        'last_name' => trim($_POST['last_name']),
+        'birth_date' => trim($_POST['birth_date']),
+        'country' => trim($_POST['country']),
+        'english_level' => trim($_POST['english_level']),
+        'learning_goal' => trim($_POST['learning_goal']),
+        'learning_time_per_day' => trim($_POST['learning_time_per_day']),
+        'learning_style' => trim($_POST['learning_style']),
+        'previous_apps' => trim($_POST['previous_apps']),
+        'interests' => trim($_POST['interests']),
+        'favorite_content' => trim($_POST['favorite_content']),
+    ];
+    $saveProfile->create($data);
+}
+
+
 
 $username = $_SESSION['username'];
 $userId = $_SESSION['user_id'];
@@ -85,7 +117,7 @@ $userId = $_SESSION['user_id'];
 </head>
 <body>
     <div class="container" x-data="wizard()">
-        <form id="profileForm" action="/lingoloop/public/SaveProfileController.php" method="POST" onsubmit="return validateForm()">
+        <form id="profileForm" action="/lingoloop/view/setup_profile.php" method="POST" onsubmit="return validateForm()">
             <input type="hidden" name="user_id" value="<?= $userId ?>">
             
             <!-- Step 0: Einführung -->
@@ -261,11 +293,6 @@ $userId = $_SESSION['user_id'];
 
         // Initialize first step
         showStep(currentStep);
-    </script>
-    <script>
-    window.addEventListener("beforeunload", function () {
-        navigator.sendBeacon("/lingoloop/public/logout.php");
-    });
-    </script>
+    </script>   
 </body>
 </html>

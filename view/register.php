@@ -1,16 +1,29 @@
 <?php
-require_once __DIR__ . '/../../../core/SessionManager.php';
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
+require_once __DIR__ . '/../controller/AuthController.php';
+
 
 if (SessionManager::isLoggedIn()) {
-    header("Location: /lingoloop/public/index.php?action=welcome");
+    header("Location: /lingoloop/view/index.php?action=welcome");
     exit();
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $auth = new AuthController();
+  $username = trim($_POST['username']);
+  $email = trim($_POST['email']);
+  $password = trim($_POST['password']);
+  $_SESSION['raw_password'] = $password;
+  $error = $auth->register($username, $email, $password);
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login | LingoLoop</title>
+  <title>Register | LingoLoop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* Reset */
@@ -31,7 +44,7 @@ if (SessionManager::isLoggedIn()) {
       border-radius: 8px;
       width: 100%;
       max-width: 600px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
       animation: fadeIn 1s ease-in-out;
     }
     @keyframes fadeIn {
@@ -53,6 +66,7 @@ if (SessionManager::isLoggedIn()) {
       margin-bottom: 5px;
     }
     input[type="text"],
+    input[type="email"],
     input[type="password"] {
       width: 100%;
       padding: 12px;
@@ -67,7 +81,7 @@ if (SessionManager::isLoggedIn()) {
       padding: 15px;
       border: none;
       border-radius: 4px;
-      background-color: #007BFF;
+      background-color: #28a745; /* zelena boja */
       color: #fff;
       font-size: 1.2rem;
       font-weight: bold;
@@ -75,7 +89,7 @@ if (SessionManager::isLoggedIn()) {
       transition: background-color 0.3s ease;
     }
     button:hover {
-      background-color: #0056b3;
+      background-color: #218838;
     }
     p {
       font-size: 1rem;
@@ -92,35 +106,38 @@ if (SessionManager::isLoggedIn()) {
     }
     @media (max-width: 600px) {
       .container {
-         padding: 20px;
+        padding: 20px;
       }
       h2 {
-         font-size: 1.5rem;
+        font-size: 1.5rem;
       }
       button {
-         font-size: 1rem;
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Login to LingoLoop</h2>
+    <h2>Create an Account</h2>
     <?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-    <form method="POST" action="/lingoloop/public/index.php">
-      <input type="hidden" name="action" value="login">
+    <form method="POST" action="/lingoloop/view/register.php">
+      <input type="hidden" name="action" value="register">
       <div class="form-group">
         <label>Username</label>
         <input type="text" name="username" placeholder="Enter your username" required>
       </div>
       <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter your email" required>
+      </div>
+      <div class="form-group">
         <label>Password</label>
         <input type="password" name="password" placeholder="Enter your password" required>
       </div>
-      <button type="submit">Login</button>
+      <button type="submit">Register</button>
     </form>
-    <p>Don't have an account? <a href="/lingoloop/public/?action=register">Register here</a></p>
+    <p>Already have an account? <a href="/lingoloop/view/login.php">Login here</a></p>
   </div>
 </body>
 </html>
-

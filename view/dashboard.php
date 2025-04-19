@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../../../core/SessionManager.php';
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
+
 
 // Check if user is logged in
 SessionManager::start();

@@ -5,15 +5,17 @@ import ast
 import time  # ⏰ dodaj import
 
 # Podesi putanju do core/
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from core.Database import *
+sys.path.append("C:/xampp/htdocs/LingoLoop")
+from models.Database import *
 from groq import Groq
 
 class AI_VOCABULARY_GENERATION:
     def __init__(self):
         self.__connection = Database.get_instance()
         self.__cursor = self.__connection.cursor()
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'config', 'keys.json')), 'r') as file:
+        config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config', 'keys.json'))
+        with open(config_path, 'r') as file:
+
             data = json.load(file)
             groq = data["Groq"]
         self.__client = Groq(api_key=groq)

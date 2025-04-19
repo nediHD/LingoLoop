@@ -5,7 +5,8 @@ require_once BASE_PATH . '/core/Database.php';
 SessionManager::startSession();
 
 if (!SessionManager::isLoggedIn()) {
-    header("Location: /lingoloop/public/?action=login");
+    header("Location: /lingoloop/view/index.php?action=login");
+
     exit();
 }
 
@@ -36,5 +37,6 @@ foreach ($selectedIndexes as $index) {
 // Očistimo sesiju nakon unosa
 unset($_SESSION['vocab_list']);
 
-header("Location: /lingoloop/public/?action=welcome");
+header("Location: /lingoloop/view/index.php?action=welcome");
+
 exit();

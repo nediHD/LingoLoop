@@ -1,12 +1,12 @@
+
 <?php
-require_once __DIR__ . '/../../../core/SessionManager.php';
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
 
 SessionManager::startSession();
-
-
-
 if (!SessionManager::isLoggedIn()) {
-    header("Location: /lingoloop/public/?action=login");
+    header("Location: /lingoloop/view/index.php?action=login");
+
     exit();
 }
 
@@ -55,7 +55,7 @@ $vocabList = $_SESSION['vocab_list'];
 
 <h2>Select Up to 10 Favorite Words ❤️</h2>
 
-<form method="POST" action="/lingoloop/public/index.php">
+<form method="POST" action="/lingoloop/view/index.php">
     <?php foreach ($vocabList as $index => $item): ?>
         <div class="word-box">
             <div>
@@ -68,6 +68,12 @@ $vocabList = $_SESSION['vocab_list'];
     <input type="hidden" name="selected_words" id="selectedWords" value="[]">
     <button type="submit">Save Selected Words</button>
 </form>
+<script>
+window.addEventListener("beforeunload", function () {
+  navigator.sendBeacon("/LingoLoop/controller/LogoutController.php");
+});
+</script>
+
 
 </body>
 </html>

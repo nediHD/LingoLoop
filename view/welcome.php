@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ . '/../../../core/SessionManager.php';
+require_once BASE_PATH . '/models/SessionManager.php';
 
 SessionManager::startSession();
 
 if (!SessionManager::isLoggedIn()) {
-    header("Location: /lingoloop/public/?action=login");
+    header("Location: /lingoloop/view/?action=login");
     exit();
 }
 
@@ -25,7 +25,7 @@ $username = $_SESSION['username'];
         <h1 class="text-3xl font-bold mb-4">Welcome, <?php echo htmlspecialchars($username); ?>! 👋</h1>
         <p class="text-gray-300 mb-6">You are successfully logged in to <span class="font-semibold text-white">LingoLoop</span>.</p>
         
-        <a href="/lingoloop/public/logout.php" class="bg-red-600 hover:bg-red-700 transition px-6 py-2 rounded text-white font-semibold">
+        <a href="/lingoloop/controller/LogoutController.php" class="bg-red-600 hover:bg-red-700 transition px-6 py-2 rounded text-white font-semibold">
             Logout
         </a>
     </div>
