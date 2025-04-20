@@ -8,12 +8,26 @@ class VocabularyManager
     {
         $this->db = $db;
     }
+   
+    public function translation_to($term) {
+        $escapedInput = escapeshellarg($term);
+        $pythonScript = BASE_PATH . "/models/ai_translation.py";
+        $command = "python" . escapeshellarg($pythonScript) . " $escapedInput";
+        $output = shell_exec($command);
+        $translation = json_decode($output, true);
+    
+        if ($translation === null) {
+            error_log("❌ Translation failed. Raw output: $output");
+        }
+    
+        return $translation;
+    }
 
-    public function addWordToProfile($userId, $word, $translation,)
+    public function addWordToProfile($userId, $word, $translation)
     {
         $stmt = $this->db->prepare("INSERT INTO user_vocabulary 
-            (user_id, term, translation, date_added, last_used, points, next_review_date, review_days)
-            VALUES (?, ?, ?, NOW(), NULL, 0, NOW(),0)");
+            (user_id, term, translation, date_added,  points, next_review_date, review_days)
+            VALUES (?, ?, ?, NOW(),  0, NOW(),0)");
 
         $stmt->bind_param("iss", $userId, $word, $translation);
         $stmt->execute();
