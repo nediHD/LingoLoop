@@ -79,7 +79,7 @@ $username = $_SESSION['username'];
 <h1>Welcome back, <?= htmlspecialchars($username) ?> 👋</h1>
 
 <div class="btn-container">
-    <a href="/lingoloop/view/select_vocab.php" class="btn">📚 Vocabulary</a>
+    <a href="/lingoloop/view/vocabulary_dashboard.php" class="btn">📚 Vocabulary</a>
     <a href="/lingoloop/view/videos.php" class="btn">🎬 Watch Videos</a>
     <a href="/lingoloop/view/ichat.php" class="btn">💬 iChatting</a>
 </div>

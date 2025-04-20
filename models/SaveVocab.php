@@ -20,8 +20,8 @@ class UserVocabulary
     public function saveSelectedWords(int $userId, array $vocabList, array $selectedIndexes): void
     {
         $stmt = $this->db->prepare("INSERT INTO user_vocabulary 
-            (user_id, term, translation, date_added, last_used, points, next_review_date)
-            VALUES (?, ?, ?, NOW(), NULL, 0, NOW())
+            (user_id, term, translation, date_added, last_used, points, next_review_date, review_days)
+            VALUES (?, ?, ?, NOW(), NULL, 0, NOW(),0)
         ");
 
         if (!$stmt) {
@@ -51,4 +51,6 @@ class UserVocabulary
 
     return $stmt->num_rows > 0;
 }
+
+
 }
