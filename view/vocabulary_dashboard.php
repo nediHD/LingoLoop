@@ -106,8 +106,8 @@ $toRepeat = $vocabManager->countWordsToRepeat($userId);
 
 <div class="button-grid">
     <a href="/lingoloop/view/add_word.php" class="action-btn">➕ Add Words</a>
-    <a href="delete_words.php" class="action-btn">🗑️ Delete Words</a>
-    <a href="learn_words.php" class="action-btn">📖 Learn Words</a>
+    <a href="/lingoloop/view/delete_word.php" class="action-btn">🗑️ Delete Words</a>
+    <a href="/lingoloop/view/learn_words.php" class="action-btn">📖 Learn Words</a>
     <a href="revise_words.php" class="action-btn">🔄 Revise Words</a>
 </div>
 

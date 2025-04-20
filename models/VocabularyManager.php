@@ -11,8 +11,9 @@ class VocabularyManager
    
     public function translation_to($term) {
         $escapedInput = escapeshellarg($term);
-        $pythonScript = BASE_PATH . "/models/ai_translation.py";
-        $command = "python" . escapeshellarg($pythonScript) . " $escapedInput";
+        $pythonScript = __DIR__ . "/ai_translation.py";
+        $command = "python " . escapeshellarg($pythonScript) . " $escapedInput 2>&1";
+    
         $output = shell_exec($command);
         $translation = json_decode($output, true);
     
@@ -66,7 +67,7 @@ class VocabularyManager
 
     public function setWordLearned($wordId)
     {
-        $stmt = $this->db->prepare("UPDATE user_vocabulary SET  review_days = review_days + 1, next_review_date = CURDATE() + INTERVAL review_days DAY WHERE id = ?");
+        $stmt = $this->db->prepare("UPDATE user_vocabulary SET  to_learn = 0,review_days = review_days + 1, next_review_date = CURDATE() + INTERVAL review_days DAY WHERE id = ?");
         $stmt->bind_param("i", $wordId);
         $stmt->execute();
         $stmt->close();
@@ -121,7 +122,7 @@ class VocabularyManager
 
     public function getAllWords($userId)
     {
-        $stmt = $this->db->prepare("SELECT * FROM user_vocabulary WHERE user_id = ?");
+        $stmt = $this->db->prepare("SELECT * FROM user_vocabulary WHERE user_id = ? ORDER BY date_added DESC");
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();

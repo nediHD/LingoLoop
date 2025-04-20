@@ -15,31 +15,32 @@ $db = Database::getInstance();
 $userId = $_SESSION['user_id'] ?? null;
 $vocabManager = new VocabularyManager($db);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
+// Dodavanje reči
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $word = trim($_POST['term']);
     if ($word) {
         $translation = $vocabManager->translation_to($word);
-        if ($word && $translation) {
+        if ($translation) {
             $vocabManager->addWordToProfile($userId, $word, $translation);
+            header("Location: add_word.php");
+            exit();
         } else {
-            echo "<p style='color:red;'>❌ Translation failed. Please check your internet connection or AI service.</p>";
-
+            echo "<p style='color:red;'>❌ Translation failed. Check your internet connection or AI service.</p>";
         }
-        
     }
 }
 
-// Današnje reči
+// Prikaz današnjih reči
 $todayWords = array_filter(
     $vocabManager->getAllWords($userId),
-    fn($word) => $word['date_added'] === date('Y-m-d')
+    fn($word) => substr($word['date_added'], 0, 10) === date('Y-m-d')
 );
 
-// Brisanje
+// Brisanje reči
 if (isset($_GET['delete'])) {
     $wordId = intval($_GET['delete']);
     $vocabManager->deleteWord($wordId);
-    header("Location: add_words.php");
+    header("Location: add_word.php");
     exit();
 }
 ?>
@@ -51,10 +52,23 @@ if (isset($_GET['delete'])) {
     <title>Add Word (Auto Translation)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
-        h2 { text-align: center; margin-bottom: 20px; }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
-        form { max-width: 600px; margin: 0 auto 30px auto; }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
         input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -90,23 +104,25 @@ if (isset($_GET['delete'])) {
         }
 
         .word-button {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background-color: #111;
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
             border-radius: 6px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .word-button span {
+        .word-content span {
             font-size: 1.1rem;
+            margin-bottom: 10px;
         }
 
         .delete-btn {
-            background-color: #dc3545;
+            background-color: #28a745;
             color: white;
-            padding: 6px 12px;
+            padding: 8px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -125,17 +141,21 @@ if (isset($_GET['delete'])) {
 
 <div class="scroll-container">
     <h3>📅 Words Added Today</h3>
-    <?php foreach ($todayWords as $word): ?>
-        <div class="word-button">
-            <span><?= htmlspecialchars($word['term']) ?> – <?= htmlspecialchars($word['translation']) ?></span>
-            <form method="GET" onsubmit="return confirm('Delete this word?');">
-                <input type="hidden" name="delete" value="<?= $word['id'] ?>">
-                <button type="submit" class="delete-btn">Delete</button>
-            </form>
-        </div>
-    <?php endforeach; ?>
+
     <?php if (empty($todayWords)): ?>
         <p>No words added today.</p>
+    <?php else: ?>
+        <?php foreach ($todayWords as $word): ?>
+            <div class="word-button">
+                <div class="word-content">
+                    <span><?= htmlspecialchars($word['term']) ?> – <?= htmlspecialchars($word['translation']) ?></span>
+                </div>
+                <form method="GET" onsubmit="return confirm('Delete this word?');">
+                    <input type="hidden" name="delete" value="<?= $word['id'] ?>">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 </div>
 
