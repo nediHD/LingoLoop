@@ -81,6 +81,13 @@ $toRepeat = $vocabManager->countWordsToRepeat($userId);
             background-color: #333;
         }
 
+        .disabled {
+            background-color: #333;
+            color: #777;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .back-btn {
             display: block;
             background-color: #28a745;
@@ -107,8 +114,18 @@ $toRepeat = $vocabManager->countWordsToRepeat($userId);
 <div class="button-grid">
     <a href="/lingoloop/view/add_word.php" class="action-btn">➕ Add Words</a>
     <a href="/lingoloop/view/delete_word.php" class="action-btn">🗑️ Delete Words</a>
-    <a href="/lingoloop/view/learn_words.php" class="action-btn">📖 Learn Words</a>
-    <a href="revise_words.php" class="action-btn">🔄 Revise Words</a>
+
+    <?php if ($toLearn > 0): ?>
+        <a href="/lingoloop/view/learn_words.php" class="action-btn">📖 Learn Words</a>
+    <?php else: ?>
+        <div class="action-btn disabled" title="No words to learn">📖 Learn Words</div>
+    <?php endif; ?>
+
+    <?php if ($toRepeat > 0): ?>
+        <a href="/lingoloop/view/revise_words.php" class="action-btn">🔄 Revise Words</a>
+    <?php else: ?>
+        <div class="action-btn disabled" title="No words to revise">🔄 Revise Words</div>
+    <?php endif; ?>
 </div>
 
 <a href="/lingoloop/view/dashboard.php" class="back-btn">⬅ Back to Dashboard</a>

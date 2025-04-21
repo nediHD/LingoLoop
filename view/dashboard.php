@@ -80,7 +80,7 @@ $username = $_SESSION['username'];
 
 <div class="btn-container">
     <a href="/lingoloop/view/vocabulary_dashboard.php" class="btn">📚 Vocabulary</a>
-    <a href="/lingoloop/view/videos.php" class="btn">🎬 Watch Videos</a>
+    <a href="/lingoloop/view/watch_videos.php" class="btn">🎬 Watch Videos</a>
     <a href="/lingoloop/view/ichat.php" class="btn">💬 iChatting</a>
 </div>
 

@@ -92,7 +92,7 @@ class VocabularyManager
 
     public function countWordsToRepeat($userId)
     {
-    $stmt = $this->db->prepare("SELECT COUNT(*) FROM user_vocabulary WHERE user_id = ? AND to_learn = 0");
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM user_vocabulary WHERE user_id = ? AND to_learn = 0 AND next_review_date <= CURDATE() ");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $stmt->bind_result($count);
@@ -131,7 +131,7 @@ class VocabularyManager
 
     public function getLeastPointWords($userId)
     {
-        $stmt = $this->db->prepare("SELECT term, translation FROM user_vocabulary WHERE user_id = ? AND last_used != 0 ORDER BY points ASC LIMIT 20");
+        $stmt = $this->db->prepare("SELECT term FROM user_vocabulary WHERE user_id = ? AND to_learn = 0 ORDER BY points ASC LIMIT 20");
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();

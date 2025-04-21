@@ -10,7 +10,6 @@ if (!SessionManager::isLoggedIn()) {
     exit();
 }
 
-// RESET sesije ako kliknuto na Menu
 if (isset($_GET['reset'])) {
     unset($_SESSION['learn_data'], $_SESSION['view_mode'], $_SESSION['rot_count'], $_SESSION['total']);
     header("Location: vocabulary_dashboard.php");
@@ -21,7 +20,6 @@ $db = Database::getInstance();
 $userId = $_SESSION['user_id'] ?? null;
 $vocabManager = new VocabularyManager($db);
 
-// Inicijalizacija učenja
 if (!isset($_SESSION['learn_data'])) {
     $_SESSION['learn_data'] = $vocabManager->getWordsToLearn($userId);
     $_SESSION['rot_count'] = 0;
@@ -29,17 +27,14 @@ if (!isset($_SESSION['learn_data'])) {
     $_SESSION['total'] = count($_SESSION['learn_data']);
 }
 
-// Ako nema više reči za učenje
 if (empty($_SESSION['learn_data'])) {
     unset($_SESSION['learn_data'], $_SESSION['view_mode'], $_SESSION['rot_count'], $_SESSION['total']);
     header("Location: vocabulary_dashboard.php");
     exit();
 }
 
-// Određivanje pravca prevoda
 $direction = $_SESSION['rot_count'] % 3 < 2 ? 'DE_EN' : 'EN_DE';
 
-// Obrada akcija
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     $current = $_SESSION['learn_data'][0];
@@ -62,9 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $_SESSION['rot_count']++;
         $_SESSION['view_mode'] = 0;
     }
+
+    // ➕ Dodato: Provera posle akcije
+    if (empty($_SESSION['learn_data'])) {
+        unset($_SESSION['learn_data'], $_SESSION['view_mode'], $_SESSION['rot_count'], $_SESSION['total']);
+        header("Location: vocabulary_dashboard.php");
+        exit();
+    }
 }
 
-// Priprema podataka za prikaz
+// ➕ Dodato: Provera pre prikaza
+if (empty($_SESSION['learn_data'])) {
+    header("Location: vocabulary_dashboard.php");
+    exit();
+}
+
 $current = $_SESSION['learn_data'][0];
 $question = $direction === 'DE_EN' ? $current['translation'] : $current['term'];
 $correctAnswer = $direction === 'DE_EN' ? $current['term'] : $current['translation'];
@@ -89,10 +96,7 @@ $progress = $total > 0 ? round(($done / $total) * 100) : 0;
             text-align: center;
         }
 
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+        h2 { font-size: 2rem; margin-bottom: 20px; }
 
         .word-box {
             background-color: #111;
