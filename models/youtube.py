@@ -254,7 +254,8 @@ Return only the description string, no bullet points, no extra formatting.
 
 
 if __name__ == "__main__":
-    k = YOUTUBE()
-    results = k.fetch_top_video_summaries(user_id=1)
-    print(results)
-    print(k.convert_transcript_to_readable_text(f'https://www.youtube.com/watch?v=HX6M4QunVmA'))
+    video_url = sys.argv[1]  # URL iz PHP-a
+    yt = YOUTUBE()
+    result = yt.convert_transcript_to_readable_text(video_url)
+    print(result)
+    
