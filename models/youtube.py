@@ -9,7 +9,7 @@ import ast
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptAvailable
 from groq import Groq
-
+import textwrap
 sys.path.append("C:/xampp/htdocs/LingoLoop")
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -169,53 +169,92 @@ Return only the description string, no bullet points, no extra formatting.
         description = self.generate_short_description(transcript)
         duration = isodate.parse_duration(item["contentDetails"]["duration"])
 
-        print(f"🎥 Title: {title}")
-        print(f"📝 Description: {description}")
-        print(f"⏱️ Duration: {str(duration)}")
-        print(f"🔗 URL: https://www.youtube.com/watch?v={video_id}")
-        print("--------------------------------------------------")
+        return [title,description,str(duration),f'https://www.youtube.com/watch?v={video_id}']
+    def fetch_top_video_summaries(self, user_id, max_videos=10, top_n=4):
+        queries, words = self.get_tittles(user_id)
+
+        all_video_data = []
+        seen_urls = set()
+
+        for query in queries:
+            results = self.search_youtube_videos(query)
+            for video in results:
+                if video["url"] not in seen_urls:
+                    seen_urls.add(video["url"])
+                    transcript = self.get_transcript_en(video["url"])
+                    short_transcript = transcript[:1000]
+                    all_video_data.append({
+                        "title": video["title"],
+                        "url": video["url"],
+                        "transcript": short_transcript
+                    })
+                if len(all_video_data) >= max_videos:
+                    break
+
+        top_videos = self.find_top_videos(words, all_video_data, top_n=top_n)
+        summaries = []
+
+        for video in top_videos:
+            match = next((v for v in all_video_data if v["url"] == video["url"]), None)
+            if match:
+                summary = self.display_video_summary(video["url"], match["transcript"])
+                if summary:
+                    summaries.append(summary)
+
+        return summaries
+    
+  
+
+    def convert_transcript_to_readable_text(self, video_url):
+        transcript = self.get_transcript_en(video_url)
+        if not transcript or transcript.startswith("["):
+            return "Transcript not available or could not be retrieved."
+
+        chunks = textwrap.wrap(transcript, width=3500)  # oko 700–900 tokena po chunku
+        full_output = ""
+
+        for i, chunk in enumerate(chunks):
+            prompt = f"""
+    You are a helpful assistant. The following is a raw transcript from a YouTube video.
+    Your task is to lightly edit it so that it becomes a clean, well-structured, readable article.
+
+    ⚠️ IMPORTANT:
+    - Do NOT change or remove facts, names, or events.
+    - Do NOT invent or add content.
+    - Keep the original sequence and meaning.
+    - Your goal is only to improve grammar, punctuation, and structure for easier reading.
+
+    Transcript Part {i+1}:
+    \"\"\"{chunk}\"\"\"
+
+    Now rewrite this part as a readable article with paragraphs. Return only the text.
+    """
+
+            try:
+                completion = self.__client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": "You are an assistant that improves transcript readability without changing the content."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.3,
+                    max_tokens=1800,
+                    top_p=1
+                )
+                part_output = completion.choices[0].message.content.strip()
+                full_output += part_output + "\n\n"
+            except Exception as e:
+                full_output += f"[Error generating part {i+1}: {str(e)}]\n\n"
+
+        return full_output.strip()
+    
 
 
-# ==============================
-# MAIN EXECUTION
-# ==============================
+
+
 
 if __name__ == "__main__":
     k = YOUTUBE()
-    queries, words = k.get_tittles(1)
-
-    print("📚 LLM Title Suggestions:")
-    for title in queries:
-        print("-", title)
-
-    # Prikupi video podatke (bez duplikata)
-    all_video_data = []
-    seen_urls = set()
-    max_videos = 10
-
-    for query in queries:
-        results = k.search_youtube_videos(query)
-        for video in results:
-            if video["url"] not in seen_urls:
-                seen_urls.add(video["url"])
-                transcript = k.get_transcript_en(video["url"])
-                short_transcript = transcript[:1000]
-                all_video_data.append({
-                    "title": video["title"],
-                    "url": video["url"],
-                    "transcript": short_transcript
-                })
-            if len(all_video_data) >= max_videos:
-                break
-
-    # Pronađi top 4 videa
-    top_videos = k.find_top_videos(words, all_video_data, top_n=4)
-
-    print("\n==============================")
-    print("✅ 🎓 TOP 4 VIDEOS FOR LEARNING:")
-    print("==============================")
-    for i, video in enumerate(top_videos, 1):
-        print(f"\n🎯 TOP {i}")
-        match = next((v for v in all_video_data if v["url"] == video["url"]), None)
-        if match:
-            k.display_video_summary(video["url"], match["transcript"])
+    results = k.fetch_top_video_summaries(user_id=1)
+    print(results)
+    print(k.convert_transcript_to_readable_text(f'https://www.youtube.com/watch?v=HX6M4QunVmA'))
