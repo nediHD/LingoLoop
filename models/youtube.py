@@ -108,7 +108,7 @@ Videos:
 {json.dumps(list(unique_videos), ensure_ascii=False, indent=2)}
 """
         completion = self.__client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama3-8b-8192",
             messages=[
                 {"role": "system", "content": "You are a helpful English language tutor and recommender."},
                 {"role": "user", "content": prompt}
@@ -139,7 +139,7 @@ Return only the description string, no bullet points, no extra formatting.
 """
         try:
             completion = self.__client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama3-8b-8192",
                 messages=[
                     {"role": "system", "content": "You are a concise YouTube video summarizer."},
                     {"role": "user", "content": prompt}
@@ -232,7 +232,7 @@ Return only the description string, no bullet points, no extra formatting.
 
             try:
                 completion = self.__client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
+                    model="llama3-8b-8192",
                     messages=[
                         {"role": "system", "content": "You are an assistant that improves transcript readability without changing the content."},
                         {"role": "user", "content": prompt}
@@ -254,8 +254,26 @@ Return only the description string, no bullet points, no extra formatting.
 
 
 if __name__ == "__main__":
-    video_url = sys.argv[1]  # URL iz PHP-a
     yt = YOUTUBE()
-    result = yt.convert_transcript_to_readable_text(video_url)
-    print(result)
+    
+    if len(sys.argv) == 2:
+        # Samo jedan argument
+        param = sys.argv[1]
+        if param.startswith("http"):
+            # Radi se o video URL-u
+            result = yt.convert_transcript_to_readable_text(param)
+            print(result)
+        else:
+            # Pretpostavljamo da je user_id
+            result = yt.fetch_top_video_summaries(int(param), max_videos=10, top_n=4)
+            print(json.dumps(result))
+    
+    elif len(sys.argv) == 3 and sys.argv[2] == "transcript":
+        video_url = sys.argv[1]
+        result = yt.convert_transcript_to_readable_text(video_url)
+        print(result)
+    
+    else:
+        print("[Error: Invalid arguments provided.]")
+
     
