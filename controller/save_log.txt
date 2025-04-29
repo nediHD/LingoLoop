@@ -1,0 +1,78 @@
+2025-04-30 00:25:07 - Pozvan save_word.php
+2025-04-30 00:25:09 - Pozvan save_word.php
+2025-04-30 00:25:10 - Pozvan save_word.php
+2025-04-30 00:25:11 - Pozvan save_word.php
+2025-04-30 00:25:12 - Pozvan save_word.php
+2025-04-30 00:25:13 - Pozvan save_word.php
+2025-04-30 00:25:14 - Pozvan save_word.php
+2025-04-30 00:25:15 - Pozvan save_word.php
+2025-04-30 00:25:15 - Pozvan save_word.php
+2025-04-30 00:25:17 - Pozvan save_word.php
+2025-04-30 00:25:17 - Pozvan save_word.php
+2025-04-30 00:25:21 - Pozvan save_word.php
+2025-04-30 00:33:50 - Pozvan save_word.php
+2025-04-30 00:33:58 - Pozvan save_word.php
+2025-04-30 00:33:59 - Pozvan save_word.php
+2025-04-30 00:34:00 - Pozvan save_word.php
+2025-04-30 00:34:00 - Pozvan save_word.php
+2025-04-30 00:34:01 - Pozvan save_word.php
+2025-04-30 00:34:02 - Pozvan save_word.php
+2025-04-30 00:34:03 - Pozvan save_word.php
+2025-04-30 00:36:38 - Pozvan save_word.php
+2025-04-30 00:36:39 - Pozvan save_word.php
+2025-04-30 00:36:41 - Pozvan save_word.php
+2025-04-30 00:37:03 - Pozvan save_word.php
+2025-04-30 00:37:03 - Pozvan save_word.php
+2025-04-30 00:37:03 - Pozvan save_word.php
+2025-04-30 00:37:04 - Pozvan save_word.php
+2025-04-30 00:37:05 - Pozvan save_word.php
+2025-04-30 00:37:06 - Pozvan save_word.php
+2025-04-30 00:37:06 - Pozvan save_word.php
+2025-04-30 00:41:03 - Pozvan save_word.php s index: 0
+2025-04-30 00:42:12 - Pozvan save_word.php | index: 0 | userId:  | broj prijevoda: 0
+2025-04-30 00:43:08 - Pozvan save_word.php | index: 0 | userId:  | broj prijevoda: 0
+2025-04-30 00:43:11 - Pozvan save_word.php | index: 0 | userId:  | broj prijevoda: 0
+2025-04-30 00:48:16 - Pozvan save_word.php | index: 0 | userId:  | broj prijevoda: 0
+2025-04-30 00:49:59 - Pozvan save_word.php | index: 1 | userId:  | broj prijevoda: 0
+2025-04-30 00:50:00 - Pozvan save_word.php | index: 2 | userId:  | broj prijevoda: 0
+2025-04-30 00:50:13 - Pozvan save_word.php | index: 0 | userId:  | broj prijevoda: 0
+2025-04-30 00:50:14 - Pozvan save_word.php | index: 1 | userId:  | broj prijevoda: 0
+2025-04-30 00:50:15 - Pozvan save_word.php | index: 2 | userId:  | broj prijevoda: 0
+2025-04-30 00:51:36 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:51:38 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:51:39 - Pozvan save_word.php | index: 2 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:51:54 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:57:02 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:57:23 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:24 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:26 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:26 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:27 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:27 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:57:55 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:57:55 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: 11
+2025-04-30 00:58:19 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:58:20 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:58:20 - Pozvan save_word.php | index: 0 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:58:20 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:58:21 - Pozvan save_word.php | index: 1 | userId: 1 | broj prijevoda: Array
+2025-04-30 00:59:25 - Pozvan save_word.php | index: 0 | userId: 1 | term: second Machine Age | translation: zweites Maschinenzeitalter
+2025-04-30 00:59:27 - Pozvan save_word.php | index: 1 | userId: 1 | term: I've had the opportunity to try the robot chef's signature dish | translation: Ich hatte die Gelegenheit, das Signature-Gericht des Roboter-Kochs auszuprobieren
+2025-04-30 01:06:05 - Pozvan save_word.php | index: 0 | userId: 1 | term: second Machine Age | translation: zweites Maschinenzeitalter
+2025-04-30 01:08:04 - Pozvan save_word.php | index: 0 | userId: 1 | term: second Machine Age | translation: zweites Maschinenzeitalter
+2025-04-30 01:08:06 - Pozvan save_word.php | index: 1 | userId: 1 | term: I've had the opportunity to try the robot chef's signature dish | translation: Ich hatte die Gelegenheit, das Signature-Gericht des Roboter-Kochs auszuprobieren
+2025-04-30 01:08:07 - Pozvan save_word.php | index: 2 | userId: 1 | term: the reality is that many jobs are already being automated | translation: die Realität ist, dass viele Jobs bereits automatisiert werden
+2025-04-30 01:10:02 - Pozvan save_word.php | index: 0 | userId: 1 | term: second Machine Age | translation: zweites Maschinenzeitalter
+2025-04-30 01:10:03 - Pozvan save_word.php | index: 0 | userId: 1 | term: I've had the opportunity to try the robot chef's signature dish | translation: Ich hatte die Gelegenheit, das Signature-Gericht des Roboter-Kochs auszuprobieren
+2025-04-30 01:10:12 - Pozvan save_word.php | index: 1 | userId: 1 | term: such as flying cars | translation: wie fliegende Autos
+2025-04-30 01:10:14 - Pozvan save_word.php | index: 2 | userId: 1 | term: about robots becoming more intelligent than humans | translation: über Roboter, die intelligenter als Menschen werden
+2025-04-30 01:10:23 - Pozvan save_word.php | index: 5 | userId: 1 | term: Clothing Industry | translation: Bekleidungsindustrie
+2025-04-30 01:13:35 - Pozvan save_word.php | index: 0 | userId: 1 | term: the reality is that many jobs are already being automated | translation: die Realität ist, dass viele Jobs bereits automatisiert werden
+2025-04-30 01:14:11 - Pozvan save_word.php | index: 4 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-04-30 01:22:07 - Pozvan save_word.php | index: 1 | userId: 1 | term: they possess skills | translation: sie besitzen Fähigkeiten
+2025-04-30 01:22:09 - Pozvan save_word.php | index: 2 | userId: 1 | term: located on a newly created peninsula | translation: auf einer neu geschaffenen Halbinsel
+2025-04-30 01:22:18 - Pozvan save_word.php | index: 0 | userId: 1 | term: there's the bottom-up approach where a computer starts | translation: da ist der Bottom-up-Ansatz, bei dem ein Computer startet
+2025-04-30 01:22:22 - Pozvan save_word.php | index: 5 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-04-30 01:27:34 - Pozvan save_word.php | index: 5 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-04-30 01:27:37 - Pozvan save_word.php | index: 2 | userId: 1 | term: continues to grow at a rapid pace | translation: wächst weiter mit rasender Geschwindigkeit
+2025-04-30 01:27:38 - Pozvan save_word.php | index: 4 | userId: 1 | term: nedefinirano | translation: nedefinirano

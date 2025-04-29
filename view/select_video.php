@@ -62,8 +62,8 @@ $videoUrl = "https://www.youtube.com/watch?v=$videoId";
 <h1>Was willst du zuerst machen?</h1>
 <div class="button-container">
     <a class="button" href="/lingoloop/view/show_transcript.php?video_id=<?= urlencode($videoId) ?>">📄 Transkript anzeigen</a>
-    <a class="button" href="<?= htmlspecialchars($videoUrl) ?>" target="_blank">▶️ Direkt zum Video</a>
-</div>
+    <a class="button" href="/lingoloop/view/watch_video_embed.php?video_id=<?= urlencode($videoId) ?>">▶️ Direkt zum Video</a>
+    </div>
 
 </body>
 </html>

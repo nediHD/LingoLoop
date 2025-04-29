@@ -1,4 +1,13 @@
 <?php
+// translate.php
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
+SessionManager::startSession();
+
+if (!SessionManager::isLoggedIn()) {
+    header("Location: /lingoloop/view/login.php");
+    exit();
+}
 header('Content-Type: application/json');
 
 $text = $_POST['text'] ?? '';
@@ -20,10 +29,17 @@ if (!$output) {
     exit;
 }
 
-// pokušaj parsiranja tupla
+// Parsiraj Python-ov izlaz ('original', 'translation')
 if (preg_match("/^\(['\"]?(.*?)['\"]?,\s*['\"]?(.*?)['\"]?\)$/", trim($output), $matches)) {
     $term = $matches[1];
     $translation = $matches[2];
+
+    // Snimi u sesiju
+    if (!isset($_SESSION['translations'])) {
+        $_SESSION['translations'] = [];
+    }
+    $_SESSION['translations'][] = ['term' => $term, 'translation' => $translation];
+
     echo json_encode(['term' => $term, 'translation' => $translation]);
 } else {
     echo json_encode(['error' => 'Failed to parse translation.', 'raw' => $output]);

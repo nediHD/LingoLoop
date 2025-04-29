@@ -1,11 +1,18 @@
 <?php
-// show_transcript.php
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
+SessionManager::startSession();
+
+if (!SessionManager::isLoggedIn()) {
+    header("Location: /lingoloop/view/login.php");
+    exit();
+}
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $videoId = $_GET['video_id'] ?? null;
-
+$_SESSION['video_id'] = $videoId;
 if (!$videoId) {
     echo "<h2>❌ No video found.</h2>";
     exit();
@@ -44,7 +51,6 @@ if (!$output) {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
             font-size: 1.1rem;
             text-align: center;
             margin-bottom: 20px;
@@ -59,6 +65,8 @@ if (!$output) {
             user-select: none;
         }
         .nav-button {
+            position: absolute;
+            top: 10px;
             background-color: #333;
             color: white;
             border: none;
@@ -67,9 +75,19 @@ if (!$output) {
             cursor: pointer;
             font-size: 1rem;
         }
+        #prev-btn {
+            left: 10px;
+        }
+        #next-btn {
+            right: 10px;
+        }
         .nav-button:disabled {
             opacity: 0.4;
             cursor: not-allowed;
+        }
+        #translation-display {
+            text-align: center;
+            flex: 1;
         }
         pre {
             background-color: #1e1e1e;
@@ -95,11 +113,28 @@ if (!$output) {
         #translate-btn:hover {
             background-color: #0056b3;
         }
+        .next-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .next-link a {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .next-link a:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
 
 <h1>📝 Transcript</h1>
+
 <div class="char-counter" id="char-counter">
     <button id="prev-btn" class="nav-button" disabled>⬅️</button>
     <span id="translation-display">🔁 Select text and click Translate</span>
@@ -109,6 +144,10 @@ if (!$output) {
 <pre id="transcript"><?= htmlspecialchars($output) ?></pre>
 
 <button id="translate-btn">Translate</button>
+
+<div class="next-link">
+    <a href="translations_list.php">➡️ View All Saved Translations</a>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -172,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.translation) {
-                const result = data.translation; // samo prijevod!
+                const result = data.translation;
                 translations.push(result);
                 currentIndex = translations.length - 1;
                 updateDisplay();
