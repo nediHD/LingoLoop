@@ -38,6 +38,7 @@ if (!$output) {
             font-size: 2.5rem;
             text-align: center;
             margin-bottom: 20px;
+            user-select: none;
         }
         .char-counter {
             display: flex;
@@ -55,6 +56,7 @@ if (!$output) {
             z-index: 20;
             border-bottom: 1px solid #444;
             min-height: 50px;
+            user-select: none;
         }
         .nav-button {
             background-color: #333;
@@ -160,12 +162,30 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const fakeTranslation = "[DE] " + selectedText;
+        fetch("translate.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: "text=" + encodeURIComponent(selectedText)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.translation) {
+                const result = data.translation; // samo prijevod!
+                translations.push(result);
+                currentIndex = translations.length - 1;
+                updateDisplay();
+            } else {
+                alert("❌ Translation failed.\n" + (data.error || "Unknown error."));
+                console.log(data);
+            }
+        })
+        .catch(err => {
+            alert("Error contacting backend.");
+            console.error(err);
+        });
 
-        translations.push(fakeTranslation);
-        currentIndex = translations.length - 1;
-
-        updateDisplay();
         translateBtn.style.display = "none";
         window.getSelection().removeAllRanges();
     });
