@@ -76,3 +76,9 @@
 2025-04-30 01:27:34 - Pozvan save_word.php | index: 5 | userId: 1 | term: nedefinirano | translation: nedefinirano
 2025-04-30 01:27:37 - Pozvan save_word.php | index: 2 | userId: 1 | term: continues to grow at a rapid pace | translation: wächst weiter mit rasender Geschwindigkeit
 2025-04-30 01:27:38 - Pozvan save_word.php | index: 4 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-04-30 01:31:02 - Pozvan save_word.php | index: 1 | userId: 1 | term: Supporters of solar geoengineering | translation: Befürworter der solaren Geoingenieure
+2025-04-30 01:31:03 - Pozvan save_word.php | index: 2 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-04-30 10:55:33 - Pozvan save_word.php | index: 1 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-05-01 00:00:31 - Pozvan save_word.php | index: 0 | userId: 1 | term: realistic images and videos | translation: realistische Bilder und Videos
+2025-05-01 00:00:38 - Pozvan save_word.php | index: 3 | userId: 1 | term: nedefinirano | translation: nedefinirano
+2025-05-01 00:00:40 - Pozvan save_word.php | index: 4 | userId: 1 | term: nedefinirano | translation: nedefinirano
