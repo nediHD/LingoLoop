@@ -28,9 +28,3 @@ unset($_SESSION['translations'][$index]);
 $_SESSION['translations'] = array_values($_SESSION['translations']);
 
 
-file_put_contents(
-    'save_log.txt',
-    date('Y-m-d H:i:s') .
-    " - Pozvan save_word.php | index: $index | userId: $userId | term: $term | translation: $translation\n",
-    FILE_APPEND
-);
