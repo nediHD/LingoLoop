@@ -1,15 +1,11 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
-
 require_once BASE_PATH . '/models/SessionManager.php';
 require_once BASE_PATH . '/models/Database.php';
 require_once BASE_PATH . '/models/SaveProfile.php';
-require_once BASE_PATH . '/controller/AuthController.php';
-
 
 SessionManager::startSession();
 
-// Ako nije ulogovan → redirect
 if (!SessionManager::isLoggedIn()) {
     header("Location: /lingoloop/view/login.php");
     exit();
@@ -18,7 +14,6 @@ if (!SessionManager::isLoggedIn()) {
 $userId = $_SESSION['user_id'];
 $db = Database::getInstance();
 $saveProfile = new SaveProfile($db);
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
@@ -34,14 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'previous_apps' => trim($_POST['previous_apps']),
         'interests' => trim($_POST['interests']),
         'favorite_content' => trim($_POST['favorite_content']),
+        'target_language' => trim($_POST['target_language']) // ✅ Dodano
     ];
     $saveProfile->create($data);
 }
-
-
-
-$username = $_SESSION['username'];
-$userId = $_SESSION['user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -49,10 +40,8 @@ $userId = $_SESSION['user_id'];
     <meta charset="UTF-8">
     <title>Profil-Einrichtung | LingoLoop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Koristimo Alpine.js samo za navigaciju wizardom -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
     <style>
-        /* Osnovni reset i stilovi */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background-color: #000;
@@ -77,35 +66,21 @@ $userId = $_SESSION['user_id'];
         .step.active { display: block; opacity: 1; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-size: 0.9em; }
-        input[type="text"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #222;
-            color: #fff;
-            font-size: 0.95em;
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%; padding: 10px; border: 1px solid #333; border-radius: 4px;
+            background-color: #222; color: #fff; font-size: 0.95em;
         }
         textarea { resize: vertical; min-height: 80px; }
         .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+            display: flex; justify-content: space-between; margin-top: 20px;
         }
         .nav-buttons button {
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            color: #fff;
+            border: none; padding: 10px 20px; border-radius: 4px;
+            cursor: pointer; transition: background-color 0.3s; color: #fff;
         }
-        #nextBtn { background-color: #28a745; } /* zelena */
+        #nextBtn { background-color: #28a745; }
         #nextBtn:hover { background-color: #218838; }
-        #submitBtn { background-color: #dc3545; } /* crvena */
+        #submitBtn { background-color: #dc3545; }
         #submitBtn:hover { background-color: #c82333; }
         #prevBtn { background-color: #333; }
         #prevBtn:hover { background-color: #555; }
@@ -119,28 +94,25 @@ $userId = $_SESSION['user_id'];
     <div class="container" x-data="wizard()">
         <form id="profileForm" action="/lingoloop/view/setup_profile.php" method="POST" onsubmit="return validateForm()">
             <input type="hidden" name="user_id" value="<?= $userId ?>">
-            
-            <!-- Step 0: Einführung -->
+
+            <!-- Step 0 -->
             <div class="step" id="step0">
                 <h2>Willkommen!</h2>
                 <p style="margin-bottom: 20px;">
-                    Um Ihnen das bestmögliche Lernerlebnis zu bieten, bitten wir Sie, einige kurze Fragen zu beantworten.
-                    Ihre Antworten helfen uns, den Unterricht genau auf Ihre Interessen und Bedürfnisse abzustimmen.
-                    Alle Daten sind vollständig privat und werden ausschließlich zur Personalisierung Ihres Lernens verwendet.
-                    Vielen Dank für Ihre Zusammenarbeit!
+                    Um Ihnen das bestmögliche Lernerlebnis zu bieten, beantworten Sie bitte einige Fragen.
                 </p>
             </div>
-            
-            <!-- Step 1: Persönliche Daten -->
+
+            <!-- Step 1 -->
             <div class="step" id="step1">
-                <h2>Schritt 1: Persönliche Daten</h2>
+                <h2>Persönliche Daten</h2>
                 <div class="form-group">
-                    <label>Vorname (z.B. "Max")</label>
-                    <input type="text" name="first_name" placeholder="Max" required>
+                    <label>Vorname</label>
+                    <input type="text" name="first_name" required>
                 </div>
                 <div class="form-group">
-                    <label>Nachname (z.B. "Mustermann")</label>
-                    <input type="text" name="last_name" placeholder="Mustermann" required>
+                    <label>Nachname</label>
+                    <input type="text" name="last_name" required>
                 </div>
                 <div class="form-group">
                     <label>Geburtsdatum</label>
@@ -169,16 +141,16 @@ $userId = $_SESSION['user_id'];
                     </select>
                 </div>
             </div>
-            
-            <!-- Step 2: Lernziele -->
+
+            <!-- Step 2 -->
             <div class="step" id="step2">
-                <h2>Schritt 2: Lernziele</h2>
+                <h2>Lernziele</h2>
                 <div class="form-group">
-                    <label>Warum lernen Sie Englisch? (z.B. "Für die Arbeit")</label>
-                    <input type="text" name="learning_goal" placeholder="Für die Arbeit" required>
+                    <label>Warum lernen Sie Englisch?</label>
+                    <input type="text" name="learning_goal" required>
                 </div>
                 <div class="form-group">
-                    <label>Wie viel Zeit pro Tag? (z.B. "20 Minuten")</label>
+                    <label>Wie viel Zeit pro Tag?</label>
                     <select name="learning_time_per_day" required>
                         <option value="">Bitte wählen</option>
                         <option value="10 Minuten">10 Minuten</option>
@@ -187,34 +159,48 @@ $userId = $_SESSION['user_id'];
                     </select>
                 </div>
             </div>
-            
-            <!-- Step 3: Lernstil -->
+
+            <!-- Step 3 -->
             <div class="step" id="step3">
-                <h2>Schritt 3: Lernstil</h2>
+                <h2>Lernstil</h2>
                 <div class="form-group">
-                    <label>Bevorzugte Lernmethode (z.B. "Vokabeln üben, Videos anschauen, Lesen, Schreiben")</label>
-                    <input type="text" name="learning_style" placeholder="Vokabeln üben, Videos anschauen, Lesen, Schreiben" required>
+                    <label>Bevorzugte Lernmethode</label>
+                    <input type="text" name="learning_style" required>
                 </div>
                 <div class="form-group">
-                    <label>Apps, die Sie bisher genutzt haben (optional)</label>
-                    <input type="text" name="previous_apps" placeholder="z.B. Duolingo">
+                    <label>Apps, die Sie bisher genutzt haben</label>
+                    <input type="text" name="previous_apps">
                 </div>
             </div>
-            
-            <!-- Step 4: Interessen & Hobbys -->
+
+            <!-- Step 4 -->
             <div class="step" id="step4">
-                <h2>Schritt 4: Interessen & Hobbys</h2>
+                <h2>Interessen & Hobbys</h2>
                 <div class="form-group">
-                    <label>Ihre Interessen, Hobbys und Leidenschaften</label>
-                    <textarea name="interests" placeholder="z.B. Fußball, Lesen, Musik (mehrere mit Komma trennen)" required></textarea>
+                    <label>Ihre Interessen</label>
+                    <textarea name="interests" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Was schauen oder hören Sie am liebsten?</label>
-                    <textarea name="favorite_content" placeholder="z.B. YouTube-Kanäle, Podcasts" required></textarea>
+                    <label>Lieblingsinhalte (YouTube, Podcasts...)</label>
+                    <textarea name="favorite_content" required></textarea>
                 </div>
             </div>
-            
-            <!-- Navigation Buttons -->
+
+            <!-- Step 5: Neuer Schritt -->
+            <div class="step" id="step5">
+                <h2>Ziel-Sprache</h2>
+                <div class="form-group">
+                    <label>Welche Sprache möchten Sie lernen?</label>
+                    <select name="target_language" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="EN">Englisch</option>
+                        <option value="FR">Französisch</option>
+                        <option value="ES">Spanisch</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buttons -->
             <div class="nav-buttons">
                 <button type="button" id="prevBtn" onclick="prevStep()" disabled>Zurück</button>
                 <button type="button" id="nextBtn" onclick="nextStep()">Weiter</button>
@@ -231,17 +217,10 @@ $userId = $_SESSION['user_id'];
         const submitBtn = document.getElementById('submitBtn');
 
         function showStep(index) {
-            steps.forEach((step, i) => {
-                step.classList.toggle('active', i === index);
-            });
-            prevBtn.disabled = (index === 0);
-            if (index === steps.length - 1) {
-                nextBtn.style.display = 'none';
-                submitBtn.style.display = 'inline-block';
-            } else {
-                nextBtn.style.display = 'inline-block';
-                submitBtn.style.display = 'none';
-            }
+            steps.forEach((step, i) => step.classList.toggle('active', i === index));
+            prevBtn.disabled = index === 0;
+            nextBtn.style.display = index === steps.length - 1 ? 'none' : 'inline-block';
+            submitBtn.style.display = index === steps.length - 1 ? 'inline-block' : 'none';
         }
 
         function nextStep() {
@@ -260,13 +239,12 @@ $userId = $_SESSION['user_id'];
             }
         }
 
-        // Custom validation for current step (skip intro step)
         function validateCurrentStep() {
             if (currentStep === 0) return true;
-            const currentFields = steps[currentStep].querySelectorAll('input[required], select[required], textarea[required]');
-            for (const field of currentFields) {
+            const fields = steps[currentStep].querySelectorAll('[required]');
+            for (const field of fields) {
                 if (!field.value.trim()) {
-                    alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent.trim() + "' aus.");
+                    alert("Bitte ausfüllen: " + field.previousElementSibling.textContent);
                     field.focus();
                     return false;
                 }
@@ -275,12 +253,11 @@ $userId = $_SESSION['user_id'];
         }
 
         function validateForm() {
-            // Validate all steps before submitting
             for (let i = 1; i < steps.length; i++) {
-                const fields = steps[i].querySelectorAll('input[required], select[required], textarea[required]');
+                const fields = steps[i].querySelectorAll('[required]');
                 for (const field of fields) {
                     if (!field.value.trim()) {
-                        alert("Bitte füllen Sie das Feld '" + field.previousElementSibling.textContent.trim() + "' aus.");
+                        alert("Bitte ausfüllen: " + field.previousElementSibling.textContent);
                         currentStep = i;
                         showStep(currentStep);
                         field.focus();
@@ -291,8 +268,7 @@ $userId = $_SESSION['user_id'];
             return true;
         }
 
-        // Initialize first step
         showStep(currentStep);
-    </script>   
+    </script>
 </body>
 </html>
