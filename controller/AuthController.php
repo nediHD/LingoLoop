@@ -22,33 +22,26 @@ class AuthController {
         if (password_verify($password, $user['password'])) {
             SessionManager::start($user['id'], $user['username']);
 
-            // 👇 Provjeri da li korisnik već ima profil
-            if (!$this->userModel->hasProfile($user['id'])) {
-                header("Location: /lingoloop/view/setup_profile.php");
+            // 👇 Ako korisnik nema red u user_profiles → pokreni LLM
+            if (!$this->userModel->hasProfileRow($user['id'])) {
+                $scriptPath = BASE_PATH . "/models/ai_vocabulary_generation.py";
+                $command = "python \"$scriptPath\" {$user['id']} 2>&1";
+                $output = shell_exec($command);
 
-
-                exit();
+                $vocab = json_decode($output, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $_SESSION['vocab_list'] = $vocab;
+                    header("Location: /lingoloop/view/select_vocab.php");
+                    exit();
+                } else {
+                    echo "Error decoding vocabulary list.";
+                    exit();
+                }
             }
 
-            $scriptPath = BASE_PATH . "/models/ai_vocabulary_generation.py";
-            $command = "python \"$scriptPath\" {$user['id']} 2>&1";
-
-            $output = shell_exec($command);
-            echo "<pre>";
-            echo "PYTHON RAW OUTPUT:\n";
-            echo htmlspecialchars($output);
-            echo "</pre>";
-            $vocab = json_decode($output, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $_SESSION['vocab_list'] = $vocab;
-            header("Location: /lingoloop/view/select_vocab.php");
-
-
+            // ✅ Ako profil postoji → idi na dashboard
+            header("Location: /lingoloop/view/dashboard.php");
             exit();
-        } else {
-            echo "Error decoding vocabulary list.";
-        }
         }
 
         return "Invalid credentials.";
@@ -62,7 +55,6 @@ class AuthController {
         $created = $this->userModel->create($username, $email, $password);
 
         if ($created) {
-            // ✅ Automatski login i redirect na profil setup
             $user = $this->userModel->findByUsername($username);
             SessionManager::start($user['id'], $user['username']);
             header("Location: /lingoloop/view/setup_profile.php");

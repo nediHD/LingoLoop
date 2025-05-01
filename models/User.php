@@ -78,7 +78,13 @@ class User {
     return $stmt->num_rows > 0;
     }
 
-    
+    public function hasProfileRow(int $userId): bool {
+        $stmt = $this->db->prepare("SELECT 1 FROM user_profiles WHERE user_id = ? LIMIT 1");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->store_result();
+        return $stmt->num_rows > 0;
+    }
 
 
 }

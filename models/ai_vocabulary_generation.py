@@ -19,6 +19,8 @@ class AI_VOCABULARY_GENERATION:
             data = json.load(file)
             groq = data["Groq"]
         self.__client = Groq(api_key=groq)
+
+    
     
     def getting_data_from_ab(self, id):
         query = "SELECT * FROM user_profiles WHERE user_id = %s"

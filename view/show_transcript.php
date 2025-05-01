@@ -1,6 +1,8 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/models/SessionManager.php';
+require_once BASE_PATH . '/models/Database.php';
+
 SessionManager::startSession();
 
 if (!SessionManager::isLoggedIn()) {
@@ -10,8 +12,15 @@ if (!SessionManager::isLoggedIn()) {
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
+$db = Database::getInstance();
+$userId = $_SESSION['user_id'];
 $videoId = $_GET['video_id'] ?? null;
+$stmt = $db->prepare("INSERT IGNORE INTO watched_videos (user_id, video_id) VALUES (?, ?)");
+$stmt->bind_param("is", $userId, $videoId);
+$stmt->execute();
+
+
+
 $_SESSION['video_id'] = $videoId;
 if (!$videoId) {
     echo "<h2>❌ No video found.</h2>";

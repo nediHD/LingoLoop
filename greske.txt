@@ -1,0 +1,7 @@
+1. NApraviti da learn words dobro funkcionira i revise words XXX
+2. Noaravuri da vdie se n pojavalju 2 puta XXX
+3. Napraviti da videi bez transkripta se ne pojavljuju XXX
+4. Napraviti kod logina da se ne koristi llm XXX
+5. Pogledati gdje ne korisiti llm XXX
+6. Vidjeti gje se pojavljuje neipravno kada prevodim rijeci
+7. REfactoring

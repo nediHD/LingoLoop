@@ -6,11 +6,16 @@ from PyPDF2 import PdfMerger
 FONT_PATH = "DejaVuSans.ttf"
 ROOT_DIR = "."  # Root directory to scan
 FINAL_PDF = "final_output.pdf"
+EXCLUDE_DIRS = {"__pycache__", ".git", "venv", "env", ".idea", ".vscode"}
 
 # Generate a visual folder structure as a string
 def generate_structure_text(root_dir):
     structure = ""
     for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Skip excluded directories
+        if any(excluded in dirpath.split(os.sep) for excluded in EXCLUDE_DIRS):
+            continue
+
         level = dirpath.replace(root_dir, '').count(os.sep)
         indent = "│   " * level + "├── "
         structure += f"{indent}{os.path.basename(dirpath)}/\n"
@@ -53,10 +58,12 @@ def convert_file_to_pdf(file_path, output_path, font_file=FONT_PATH):
     pdf.output(output_path)
     print(f"PDF created: {output_path}")
 
-# Get all .py, .php, .html files recursively
+# Get all .py, .php, .html files recursively (excluding unwanted dirs)
 def get_all_code_files(root, extensions=(".py", ".php", ".html")):
     collected = []
-    for dirpath, _, filenames in os.walk(root):
+    for dirpath, dirnames, filenames in os.walk(root):
+        if any(excluded in dirpath.split(os.sep) for excluded in EXCLUDE_DIRS):
+            continue
         for f in filenames:
             if f.endswith(extensions):
                 collected.append(os.path.join(dirpath, f))
@@ -86,13 +93,13 @@ def main():
 
     merger.write(FINAL_PDF)
     merger.close()
-    print(f"Final PDF generated as: {FINAL_PDF}")
+    print(f" Final PDF generated as: {FINAL_PDF}")
 
     # Step 4: Delete all temporary individual PDFs
     for pdf in generated_pdfs:
         if os.path.exists(pdf) and pdf != FINAL_PDF:
             os.remove(pdf)
-            print(f"Deleted: {pdf}")
+            print(f" Deleted: {pdf}")
 
 if __name__ == "__main__":
     main()

@@ -12,6 +12,8 @@ from groq import Groq
 import textwrap
 sys.path.append("C:/xampp/htdocs/LingoLoop")
 sys.stdout.reconfigure(encoding='utf-8')
+sys.path.append("C:/xampp/htdocs/LingoLoop")
+from models.Database import *
 
 
 class YOUTUBE:
@@ -24,14 +26,30 @@ class YOUTUBE:
 
         self.__title = AI_VOCABULARY_GENERATION()
         self.__client = Groq(api_key=groq_key)
+        self.__connection = Database.get_instance()
+        self.__cursor = self.__connection.cursor()
+
+
+
+    def get_watched_video_ids(self, user_id):
+        try:
+            self.__cursor.execute("SELECT video_id FROM watched_videos WHERE user_id = %s", (user_id,))
+            result = self.__cursor.fetchall()
+            return {row[0] for row in result}
+        except Exception as e:
+            print(f"[Error fetching watched videos] {e}")
+            return set()
+
 
     def get_tittles(self, user_id):
         user_data = self.__title.getting_data_from_ab(user_id)
         titles = self.__title.generate_youtube_titles(user_data)
         return titles, user_data
 
-    def search_youtube_videos(self, query, max_results=50, min_views=50000, return_limit=3):
+    def search_youtube_videos(self, query, user_id, max_results=50, min_views=50000, return_limit=3):
         youtube = build("youtube", "v3", developerKey=self.__API_key)
+
+        # Pretraga YouTube-a
         search_response = youtube.search().list(
             part="id",
             q=query,
@@ -42,15 +60,26 @@ class YOUTUBE:
 
         video_ids = [item["id"]["videoId"] for item in search_response["items"]]
 
+        # Dohvat dodatnih podataka o videima
         videos_response = youtube.videos().list(
             part="snippet,contentDetails,statistics",
             id=",".join(video_ids)
         ).execute()
 
+        # Dohvati već gledane video ID-eve
+        watched_ids = self.get_watched_video_ids(user_id)
         filtered_videos = []
 
+        # Obrada svakog videa
         for item in videos_response["items"]:
+            video_id = item["id"]
+
+            # Preskoči ako je već gledan
+            if video_id in watched_ids:
+                continue
+
             try:
+                # Filtracija po trajanju i gledanosti (bez provjere transkripta)
                 duration_iso = item["contentDetails"]["duration"]
                 duration = isodate.parse_duration(duration_iso)
                 view_count = int(item["statistics"]["viewCount"])
@@ -58,17 +87,22 @@ class YOUTUBE:
                 if timedelta(minutes=8) <= duration <= timedelta(minutes=15) and view_count >= min_views:
                     video_data = {
                         "title": item["snippet"]["title"],
-                        "url": f"https://www.youtube.com/watch?v={item['id']}",
+                        "url": f"https://www.youtube.com/watch?v={video_id}",
                         "duration": str(duration),
                         "views": view_count
                     }
                     filtered_videos.append(video_data)
+
                     if len(filtered_videos) >= return_limit:
                         break
+
             except Exception:
                 continue
 
         return filtered_videos
+
+
+
 
     def get_transcript_en(self, video_url):
         try:
@@ -177,7 +211,7 @@ Return only the description string, no bullet points, no extra formatting.
         seen_urls = set()
 
         for query in queries:
-            results = self.search_youtube_videos(query)
+            results = self.search_youtube_videos(query, user_id=user_id)
             for video in results:
                 if video["url"] not in seen_urls:
                     seen_urls.add(video["url"])
@@ -265,8 +299,9 @@ if __name__ == "__main__":
             print(result)
         else:
             # Pretpostavljamo da je user_id
-            result = yt.fetch_top_video_summaries(int(param), max_videos=10, top_n=4)
-            print(json.dumps(result))
+            user_id = int(param)
+            result = yt.fetch_top_video_summaries(user_id=user_id, max_videos=10, top_n=4)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
     
     elif len(sys.argv) == 3 and sys.argv[2] == "transcript":
         video_url = sys.argv[1]

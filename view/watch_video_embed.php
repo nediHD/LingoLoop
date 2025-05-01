@@ -1,11 +1,25 @@
 <?php
-// watch_video_embed.php
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/models/SessionManager.php';
+require_once BASE_PATH . '/models/Database.php';
 
+SessionManager::startSession();
+
+if (!SessionManager::isLoggedIn()) {
+    header("Location: /lingoloop/view/login.php");
+    exit();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Video ID koji dolazi iz URL-a
+$db = Database::getInstance();
+$userId = $_SESSION['user_id'];
 $videoId = $_GET['video_id'] ?? null;
+$stmt = $db->prepare("INSERT IGNORE INTO watched_videos (user_id, video_id) VALUES (?, ?)");
+$stmt->bind_param("is", $userId, $videoId);
+$stmt->execute();
+
 
 // Ako nema video ID-a, prikaži poruku i prekini
 if (!$videoId) {

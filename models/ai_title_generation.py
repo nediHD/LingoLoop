@@ -21,7 +21,7 @@ class AI_VOCABULARY_GENERATION:
         self.__client = Groq(api_key=groq)
     
     def getting_data_from_ab(self, id):
-        query = "SELECT term FROM user_vocabulary WHERE user_id = %s AND next_review_date <= CURDATE() "
+        query = "SELECT term FROM user_vocabulary WHERE user_id = %s AND next_review_date >= CURDATE() "
         self.__cursor.execute(query, (id,))
         column_names = [desc[0] for desc in self.__cursor.description]
         rezultati = self.__cursor.fetchall()
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     x = AI_VOCABULARY_GENERATION()
     z =x.getting_data_from_ab(1)
     k = x.generate_youtube_titles(z)
+    print(z)
     print(k)
 
 
