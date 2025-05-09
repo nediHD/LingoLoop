@@ -67,7 +67,7 @@ class UserVocabulary
     {
         $query = "SELECT 1 FROM user_vocabulary WHERE user_id = ? LIMIT 1";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $userId);
+        $stmt->bind_param("i", $userId); 
         $stmt->execute();
         $stmt->store_result();
 

@@ -27,24 +27,28 @@ class YOUTUBE:
         self.__title = AI_VOCABULARY_GENERATION()
         self.__client = Groq(api_key=groq_key)
         self.__connection = Database.get_instance()
-        self.__cursor = self.__connection.cursor()
 
 
 
     def get_watched_video_ids(self, user_id):
         try:
-            self.__cursor.execute("SELECT video_id FROM watched_videos WHERE user_id = %s", (user_id,))
-            result = self.__cursor.fetchall()
-            return {row[0] for row in result}
+            with self.__connection.cursor() as cursor:
+                cursor.execute("SELECT video_id FROM watched_videos WHERE user_id = %s", (user_id,))
+                result = cursor.fetchall()
+                if result:
+                    return [row[0] for row in result]
+                else:
+                    return []
         except Exception as e:
             print(f"[Error fetching watched videos] {e}")
-            return set()
-
+            return False
 
     def get_tittles(self, user_id):
         user_data = self.__title.getting_data_from_ab(user_id)
-        titles = self.__title.generate_youtube_titles(user_data)
-        return titles, user_data
+        target_language = self.__title.get_target_language(user_id)
+        titles = self.__title.generate_youtube_titles(user_data, target_language)
+        return titles
+
 
     def search_youtube_videos(self, query, user_id, max_results=50, min_views=50000, return_limit=3):
         youtube = build("youtube", "v3", developerKey=self.__API_key)
@@ -74,9 +78,9 @@ class YOUTUBE:
         for item in videos_response["items"]:
             video_id = item["id"]
 
-            # Preskoči ako je već gledan
-            if video_id in watched_ids:
-                continue
+            if watched_ids:
+                if video_id in watched_ids:
+                    continue
 
             try:
                 # Filtracija po trajanju i gledanosti (bez provjere transkripta)
@@ -107,7 +111,7 @@ class YOUTUBE:
     def get_transcript_en(self, video_url):
         try:
             video_id = video_url.split("v=")[-1]
-            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['fr'])
             text = " ".join([entry["text"] for entry in transcript])
             return text
         except (TranscriptsDisabled, NoTranscriptAvailable):
@@ -240,35 +244,39 @@ Return only the description string, no bullet points, no extra formatting.
   
 
     def convert_transcript_to_readable_text(self, video_url):
+        import textwrap
+
         transcript = self.get_transcript_en(video_url)
         if not transcript or transcript.startswith("["):
             return "Transcript not available or could not be retrieved."
 
-        chunks = textwrap.wrap(transcript, width=3500)  # oko 700–900 tokena po chunku
+        # Chunk samo za token kontrolu, ne skraćivanje
+        chunks = textwrap.wrap(transcript, width=3500)
         full_output = ""
 
         for i, chunk in enumerate(chunks):
             prompt = f"""
-    You are a helpful assistant. The following is a raw transcript from a YouTube video.
-    Your task is to lightly edit it so that it becomes a clean, well-structured, readable article.
+    Vous êtes un assistant utile. Voici une transcription brute d'une vidéo YouTube.
+    Votre tâche consiste à la reformuler légèrement pour en faire un article clair, bien structuré et lisible, tout en **gardant 100 % du contenu original**.
 
-    ⚠️ IMPORTANT:
-    - Do NOT change or remove facts, names, or events.
-    - Do NOT invent or add content.
-    - Keep the original sequence and meaning.
-    - Your goal is only to improve grammar, punctuation, and structure for easier reading.
+    ⚠️ INSTRUCTIONS :
+    - Ne changez, ne supprimez, ni ne résumez aucune information.
+    - Ne traduisez pas.
+    - N’inventez rien.
+    - Respectez strictement l’ordre et le contenu.
+    - Corrigez uniquement la grammaire, la ponctuation et la structure des phrases pour améliorer la lecture.
 
-    Transcript Part {i+1}:
+    Transcription – Partie {i+1} :
     \"\"\"{chunk}\"\"\"
 
-    Now rewrite this part as a readable article with paragraphs. Return only the text.
+    Réécrivez ce texte en article fluide avec des paragraphes. Retournez uniquement le texte réécrit.
     """
 
             try:
                 completion = self.__client.chat.completions.create(
                     model="llama3-8b-8192",
                     messages=[
-                        {"role": "system", "content": "You are an assistant that improves transcript readability without changing the content."},
+                        {"role": "system", "content": "Vous êtes un assistant qui améliore la lisibilité des transcriptions sans en modifier le contenu."},
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.3,
@@ -278,9 +286,10 @@ Return only the description string, no bullet points, no extra formatting.
                 part_output = completion.choices[0].message.content.strip()
                 full_output += part_output + "\n\n"
             except Exception as e:
-                full_output += f"[Error generating part {i+1}: {str(e)}]\n\n"
+                full_output += f"[Erreur lors du traitement de la partie {i+1} : {str(e)}]\n\n"
 
         return full_output.strip()
+
     
 
 
@@ -300,7 +309,7 @@ if __name__ == "__main__":
         else:
             # Pretpostavljamo da je user_id
             user_id = int(param)
-            result = yt.fetch_top_video_summaries(user_id=user_id, max_videos=10, top_n=4)
+            result = yt.get_tittles(user_id=user_id)
             print(json.dumps(result, ensure_ascii=False, indent=2))
     
     elif len(sys.argv) == 3 and sys.argv[2] == "transcript":

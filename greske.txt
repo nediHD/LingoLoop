@@ -3,5 +3,8 @@
 3. Napraviti da videi bez transkripta se ne pojavljuju XXX
 4. Napraviti kod logina da se ne koristi llm XXX
 5. Pogledati gdje ne korisiti llm XXX
-6. Vidjeti gje se pojavljuje neipravno kada prevodim rijeci
-7. REfactoring
+
+Napravi da poslije transcrpicije spremljne rijeci bolje budu zapravo sprelmljnje, trenutno ne funcionise najbolje.
+Napraviti kada dodam prijevod da cijle racenica bude spremljenja. 
+Kada video zavrsi vratime da ucim rijeci koje su dodane.
+Kod rijeci dodaj da uvijek mogu pogledati jednu recenicu s tom rijecu.

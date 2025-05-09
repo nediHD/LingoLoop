@@ -21,11 +21,13 @@ $db = Database::getInstance();
 $userId = $_SESSION['user_id'];
 $vocabManager = new VocabularyManager($db);
 
-// Load words to revise
+
 if (!isset($_SESSION['revise_data'])) {
+    $wordsToRevise = $vocabManager->getWordsToRevise($userId);
     $_SESSION['revise_data'] = is_array($wordsToRevise) ? array_slice($wordsToRevise, 0, 10) : [];
     $_SESSION['rot_count'] = 0;
     $_SESSION['total'] = count($_SESSION['revise_data']);
+    $dsds = $_SESSION['total'];
 }
 
 // Exit if no words
@@ -45,12 +47,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $_SESSION['user_input'] = $_POST['user_answer'] ?? '';
     }
 
-    if ($action === 'yes' || $action === 'no') {
-        $vocabManager->updateRevision($current['id'], ucfirst($action));
-        array_shift($_SESSION['revise_data']);
-        $_SESSION['rot_count']++;
-        unset($_SESSION['answer_revealed'], $_SESSION['user_input']);
+    if ($action === 'yes') {
+    $vocabManager->updateRevision($current['id'], 'Yes');
+    array_shift($_SESSION['revise_data']);
+    $dsdhs = $_SESSION['revise_data'];
+    $_SESSION['rot_count']++;
+    unset($_SESSION['answer_revealed'], $_SESSION['user_input']);
     }
+
+    if ($action === 'no') {
+    $vocabManager->updateRevision($current['id'], 'No');
+    // Pomeri trenutnu reč na kraj niza
+    $word = array_shift($_SESSION['revise_data']);
+    $_SESSION['revise_data'][] = $word;
+    $dsdhs = $_SESSION['revise_data'];
+    $_SESSION['rot_count']++;
+    unset($_SESSION['answer_revealed'], $_SESSION['user_input']);
+    }
+
 
     if (empty($_SESSION['revise_data'])) {
         unset($_SESSION['revise_data'], $_SESSION['rot_count'], $_SESSION['total'], $_SESSION['answer_revealed'], $_SESSION['user_input']);

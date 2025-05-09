@@ -12,182 +12,123 @@ if (!SessionManager::isLoggedIn()) {
     exit();
 }
 
+// Obrada forme
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['video_id']) && trim($_POST['video_id']) !== '') {
+    $_SESSION['video_id'] = $_POST['video_id'];
+    header("Location: select_video.php");
+    exit();
+}
+
 $userId = $_SESSION['user_id'] ?? 1;
 $pythonPath = "python";
 $scriptPath = "C:/xampp/htdocs/LingoLoop/models/youtube.py";
 $command = escapeshellcmd("$pythonPath \"$scriptPath\" $userId");
-$output = shell_exec($command);
 
-$videoList = json_decode($output, true);
+// Pokretanje Python skripte
+$output = shell_exec($command);
+$videoTitles = json_decode($output, true);
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Wähle ein Video</title>
+    <title>Choisir un sujet</title>
     <style>
         body {
             background-color: #121212;
-            color: #e0e0e0;
+            color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 30px 15px;
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.6rem;
         }
 
-        .header h1 {
-            text-align: center;
+        h1 {
             font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-transform: uppercase;
+            margin-bottom: 40px;
         }
 
-        .videos {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .videos {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .card {
-            background: #1e1e1e;
+        .title-box {
+            margin: 20px auto;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
         }
 
-        .card img {
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .card h3 {
-            margin: 0 0 10px;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .card p {
-            margin: 0 0 10px;
-            color: #ccc;
-            font-size: 0.95rem;
-            text-align: center;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .duration {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #ffc107;
-        }
-
-        .select-radio {
-            transform: scale(1.4);
-            cursor: pointer;
-        }
-
-        .actions {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        .next-button, .dashboard-button {
-            margin: 10px;
-            padding: 15px 30px;
+        .video-title {
+            margin: 10px 0;
             font-size: 1.2rem;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 6px;
+            word-wrap: break-word;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1.1rem;
+            width: 80%;
+            border-radius: 6px;
+            border: none;
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+        .go-next {
+            background-color: #28a745;
+            color: white;
+            padding: 18px 36px;
+            font-size: 1.5rem;
             font-weight: bold;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: 0.3s ease;
+            margin-top: 40px;
+            transition: background-color 0.3s ease;
         }
 
-        .next-button {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .next-button:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-        }
-
-        .dashboard-button {
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-        }
-
-        .next-button:hover:enabled {
-            background-color: #0056b3;
-        }
-
-        .dashboard-button:hover {
-            background-color: #5a6268;
+        .go-next:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
 
-<h1 class="header">🎬 Wähle ein Video</h1>
+<h1>🧠 Unesite ID videa</h1>
 
-<form action="select_video.php" method="get" id="videoForm">
-    <div class="videos">
+<form id="videoForm" method="post">
+    <div class="title-box">
+        <div style="margin-bottom: 20px;">🎬 Predloženi naslovi videa:</div>
         <?php
-        if (is_array($videoList)) {
-            foreach ($videoList as $index => $video) {
-                [$title, $description, $duration, $url] = $video;
-                parse_str(parse_url($url, PHP_URL_QUERY), $queryParams);
-                $videoId = $queryParams['v'] ?? '';
-                $thumbnailUrl = "https://img.youtube.com/vi/$videoId/hqdefault.jpg";
-
-                echo "
-                <label class='card'>
-                    <img src='$thumbnailUrl' alt='Thumbnail'>
-                    <h3>" . htmlspecialchars($title) . "</h3>
-                    <p>" . htmlspecialchars($description) . "</p>
-                    <div class='card-footer'>
-                        <span class='duration'>⏱️ $duration</span>
-                        <input type='radio' name='video_id' value='$videoId' class='select-radio' required>
-                    </div>
-                </label>
-                ";
+        if (is_array($videoTitles)) {
+            for ($i = 0; $i < min(3, count($videoTitles)); $i++) {
+                echo '<div class="video-title">' . htmlspecialchars($videoTitles[$i]) . '</div>';
             }
         } else {
-            echo "<p>⚠️ Keine Videos gefunden.</p>";
+            echo "<p>⚠️ Nema dostupnih naslova.</p>";
         }
         ?>
     </div>
 
-    <div class="actions">
-        <button type="submit" class="next-button" id="nextBtn" disabled>Weiter →</button>
-        <a href="/lingoloop/view/dashboard.php" class="dashboard-button">🔙 Zurück zum Dashboard</a>
+    <div class="title-box">
+        <label for="custom_id">
+            👉 Ručno unesite YouTube ID videa:
+        </label><br><br>
+        <input type="text" id="custom_id" name="video_id" placeholder="npr. dQw4w9WgXcQ">
     </div>
+
+    <button type="submit" class="go-next">➡️ Idi na sljedeću sekciju</button>
 </form>
 
 <script>
-    const radios = document.querySelectorAll('input[name="video_id"]');
-    const nextBtn = document.getElementById('nextBtn');
-
-    radios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            nextBtn.disabled = false;
-        });
+    document.getElementById('videoForm').addEventListener('submit', function(e) {
+        const input = document.getElementById('custom_id');
+        if (input.value.trim() === '') {
+            e.preventDefault();
+            alert('Molimo unesite ID videa pre nego što nastavite.');
+        }
     });
 </script>
 

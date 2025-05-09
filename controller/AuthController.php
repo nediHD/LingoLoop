@@ -3,13 +3,16 @@
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/SessionManager.php';
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../models/VocabularyManager.php'; // ✅ Dodano
 
 class AuthController {
     private User $userModel;
+    private VocabularyManager $vocabManager; // ✅ Dodano
 
     public function __construct() {
         $db = Database::getInstance();
         $this->userModel = new User($db);
+        $this->vocabManager = new VocabularyManager($db); // ✅ Dodano
     }
 
     public function login(string $username, string $password): ?string {
@@ -22,8 +25,15 @@ class AuthController {
         if (password_verify($password, $user['password'])) {
             SessionManager::start($user['id'], $user['username']);
 
-            // 👇 Ako korisnik nema red u user_profiles → pokreni LLM
+            // 👇 Ako korisnik nema profil → redirect
             if (!$this->userModel->hasProfileRow($user['id'])) {
+                header("Location: /lingoloop/view/setup_profile.php");
+                exit();
+            }
+
+            // ✅ Ako profil postoji ali nema nijednu riječ → pozovi LLM
+            $wordCount = $this->vocabManager->getWordsAddedToday($user['id']);
+            if ($wordCount === 0) {
                 $scriptPath = BASE_PATH . "/models/ai_vocabulary_generation.py";
                 $command = "python \"$scriptPath\" {$user['id']} 2>&1";
                 $output = shell_exec($command);
@@ -39,7 +49,7 @@ class AuthController {
                 }
             }
 
-            // ✅ Ako profil postoji → idi na dashboard
+            // ✅ Ako sve postoji → idi na dashboard
             header("Location: /lingoloop/view/dashboard.php");
             exit();
         }
