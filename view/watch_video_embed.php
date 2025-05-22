@@ -13,6 +13,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Video ID koji dolazi iz URL-a
+unset($_SESSION['translations']);
 $db = Database::getInstance();
 $userId = $_SESSION['user_id'];
 $videoId = $_GET['video_id'] ?? null;
