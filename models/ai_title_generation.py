@@ -43,12 +43,13 @@ class AI_VOCABULARY_GENERATION:
     def generate_youtube_titles(self, vocab_list, target_language):
         """Generiše YouTube pretrage bazirane na vokabularu i jeziku."""
         prompt = f"""
-    You are an AI that creates YouTube search queries to help language learners.
+    You are an AI that creates YouTube video titles to help language learners.
 
-    Generate exactly 3 YouTube search queries based on these words:
+    Generate exactly 3 YouTube video titles based on these words:
     {vocab_list}
 
     Language: {target_language}
+Each YouTube video titles must be **short**, containing **no more than 5 to 10 words**.
 
     Return a valid Python list of 3 strings.
     Example: ["...", "...", "..."]
@@ -62,7 +63,7 @@ class AI_VOCABULARY_GENERATION:
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
-                max_tokens=300,
+                max_tokens=150,
                 top_p=1
             )
             content = completion.choices[0].message.content.strip()

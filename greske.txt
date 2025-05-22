@@ -8,3 +8,4 @@ Napravi da poslije transcrpicije spremljne rijeci bolje budu zapravo sprelmljnje
 Napraviti kada dodam prijevod da cijle racenica bude spremljenja. 
 Kada video zavrsi vratime da ucim rijeci koje su dodane.
 Kod rijeci dodaj da uvijek mogu pogledati jednu recenicu s tom rijecu.
+napraviti da transkripcija bude tocija

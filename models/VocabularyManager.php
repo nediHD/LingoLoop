@@ -83,7 +83,7 @@ class VocabularyManager
 
     public function getWordsToRevise($userId)
     {
-        $stmt = $this->db->prepare("SELECT * FROM user_vocabulary WHERE user_id = ? AND next_review_date <= CURDATE()");
+        $stmt = $this->db->prepare("SELECT * FROM user_vocabulary WHERE user_id = ? AND next_review_date <= CURDATE() AND to_learn = 0");
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -103,9 +103,9 @@ class VocabularyManager
     public function updateRevision($wordId, $result)
     {
         if ($result === "Yes") {
-            $stmt = $this->db->prepare("UPDATE user_vocabulary SET points = points + 10, review_days = review_days + 1, next_review_date = CURDATE() + INTERVAL review_days DAY WHERE id = ?");
+            $stmt = $this->db->prepare("UPDATE user_vocabulary SET points = points + 10, review_days = review_days + review_days, next_review_date = CURDATE() + INTERVAL review_days DAY WHERE id = ?");
         } else {
-            $stmt = $this->db->prepare("UPDATE user_vocabulary SET points = points - 15, review_days = 0 WHERE id = ?");
+            $stmt = $this->db->prepare("UPDATE user_vocabulary SET points = points - 15, review_days = 1 WHERE id = ?");
         }
         $stmt->bind_param("i", $wordId);
         $stmt->execute();

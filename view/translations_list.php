@@ -1,14 +1,70 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/models/SessionManager.php';
+require_once BASE_PATH . '/models/Database.php';
+require_once BASE_PATH . '/models/VocabularyManager.php';
+
 SessionManager::startSession();
 
 if (!SessionManager::isLoggedIn()) {
     header("Location: /lingoloop/view/login.php");
     exit();
 }
+
+$db = Database::getInstance();
+$vocab_manager = new VocabularyManager($db);
 $translations = $_SESSION['translations'] ?? [];
 $videoId = $_SESSION['video_id'] ?? '';
+
+// ✅ Obrada AJAX zahtjeva za SPAŠAVANJE riječi
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_index'])) {
+    header('Content-Type: application/json');
+
+    $index = (int)$_POST['save_index'];
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        echo json_encode(['success' => false, 'error' => 'Not logged in']);
+        exit;
+    }
+
+    if (!isset($translations[$index])) {
+        echo json_encode(['success' => false, 'error' => 'Invalid index']);
+        exit;
+    }
+
+    $entry = $translations[$index];
+    $term = $entry['term'];
+    $translation = $entry['translation'];
+
+    try {
+        $vocab_manager->addWordToProfile($userId, $term, $translation);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+
+    exit;
+}
+
+// ✅ Obrada AJAX zahtjeva za BRISANJE riječi
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_index'])) {
+    header('Content-Type: application/json');
+
+    $index = (int)$_POST['delete_index'];
+
+    if (!isset($translations[$index])) {
+        echo json_encode(['success' => false, 'error' => 'Invalid index']);
+        exit;
+    }
+
+    // Ukloni iz sesije
+    unset($translations[$index]);
+    $_SESSION['translations'] = array_values($translations); // Reindeksiraj
+
+    echo json_encode(['success' => true]);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,7 +152,7 @@ $videoId = $_SESSION['video_id'] ?? '';
         </tr>
         <?php foreach ($translations as $index => $entry): ?>
         <tr data-index="<?= $index ?>">
-            <td><?= $index + 1 ?></td>
+            <td class="row-number"><?= $index + 1 ?></td>
             <td><?= htmlspecialchars($entry['term']) ?></td>
             <td><?= htmlspecialchars($entry['translation']) ?></td>
             <td class="actions">
@@ -113,10 +169,10 @@ $videoId = $_SESSION['video_id'] ?? '';
 
 <script>
 function saveWord(index) {
-    fetch('../controller/save_word.php', {
+    fetch(window.location.href, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'index=' + encodeURIComponent(index)
+        body: 'save_index=' + encodeURIComponent(index)
     })
     .then(response => response.json())
     .then(data => {
@@ -126,9 +182,7 @@ function saveWord(index) {
 
         if (data.success) {
             statusCell.textContent = '✅ Saved';
-
-            // Ukloni Save i Delete gumbe
-            actionsCell.innerHTML = ''; // ovo briše sadržaj <td class="actions">
+            actionsCell.innerHTML = '';
         } else {
             statusCell.textContent = '❌ Error';
             if (data.error) {
@@ -139,12 +193,11 @@ function saveWord(index) {
     });
 }
 
-
 function deleteWord(index) {
-    fetch('../controller/delete_word.php', {
+    fetch(window.location.href, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'index=' + encodeURIComponent(index)
+        body: 'delete_index=' + encodeURIComponent(index)
     })
     .then(response => response.json())
     .then(data => {
@@ -152,7 +205,10 @@ function deleteWord(index) {
             const row = document.querySelector(`tr[data-index="${index}"]`);
             row.remove();
         } else {
-            alert("Error deleting word.");
+            alert("❌ Error deleting word.");
+            if (data.error) {
+                console.error("Delete error:", data.error);
+            }
         }
     });
 }
